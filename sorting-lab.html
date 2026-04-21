@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SortLab — Algorithm Visualizer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@400;500;600;700&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f7f6f3;
+  --surface: #ffffff;
+  --surface2: #f2f1ee;
+  --border: #e4e2dc;
+  --border-strong: #ccc9c0;
+  --text: #1a1916;
+  --muted: #8a8780;
+  --muted2: #b5b3ae;
+
+  --sel: #2563eb; --sel-light: #eff6ff; --sel-mid: #bfdbfe;
+  --bub: #dc2626; --bub-light: #fff1f2; --bub-mid: #fecdd3;
+  --ins: #16a34a; --ins-light: #f0fdf4; --ins-mid: #bbf7d0;
+  --qui: #d97706; --qui-light: #fffbeb; --qui-mid: #fde68a;
+
+  --swap-c: #ef4444;
+  --cmp-c:  #f59e0b;
+  --min-c:  #3b82f6;
+  --piv-c:  #a855f7;
+  --srt-c:  #22c55e;
+
+  --mono: 'Geist Mono', monospace;
+  --serif: 'Instrument Serif', serif;
+  --sans: 'Geist', sans-serif;
+
+  --sh-sm: 0 1px 3px rgba(0,0,0,0.06),0 1px 2px rgba(0,0,0,0.04);
+  --sh:    0 4px 12px rgba(0,0,0,0.08),0 2px 4px rgba(0,0,0,0.04);
+  --sh-lg: 0 12px 32px rgba(0,0,0,0.10),0 4px 8px rgba(0,0,0,0.06);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;}
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:radial-gradient(circle,#c8c5bc 1px,transparent 1px);
+  background-size:28px 28px;opacity:0.35;pointer-events:none;z-index:0;
+}
+
+/* HEADER */
+header{position:sticky;top:0;z-index:100;background:rgba(247,246,243,0.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 28px;box-shadow:var(--sh-sm);}
+.hdr{max-width:1440px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:58px;gap:16px;}
+.logo{display:flex;align-items:center;gap:10px;}
+.logo-mark{width:36px;height:36px;background:var(--text);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:-0.04em;}
+.logo-name{font-family:var(--serif);font-size:22px;color:var(--text);letter-spacing:-0.01em;line-height:1;}
+.logo-sub{font-family:var(--mono);font-size:9px;letter-spacing:0.08em;color:var(--muted);text-transform:uppercase;margin-top:2px;}
+
+.tabs{display:flex;gap:3px;background:var(--surface2);padding:3px;border-radius:10px;border:1px solid var(--border);}
+.tab{padding:6px 16px;border-radius:7px;font-family:var(--mono);font-size:11px;font-weight:600;cursor:pointer;border:none;background:transparent;color:var(--muted);transition:all 0.18s;letter-spacing:0.02em;}
+.tab:hover{color:var(--text);background:var(--surface);}
+.tab.active{color:#fff !important;box-shadow:var(--sh-sm);}
+.tab[data-a="selection"].active{background:var(--sel);}
+.tab[data-a="bubble"].active{background:var(--bub);}
+.tab[data-a="insertion"].active{background:var(--ins);}
+.tab[data-a="quick"].active{background:var(--qui);}
+
+/* LAYOUT */
+.wrap{max-width:1440px;margin:0 auto;padding:24px 28px;display:grid;grid-template-columns:360px 1fr;gap:22px;position:relative;z-index:1;}
+
+/* SIDEBAR */
+.sidebar{display:flex;flex-direction:column;gap:14px;position:sticky;top:72px;max-height:calc(100vh - 90px);overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border-strong) transparent;padding-right:4px;}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--sh-sm);}
+.card-hdr{padding:11px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.card-lbl{font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);}
+.card-body{padding:16px;}
+
+/* ALGO INFO */
+.algo-badge{font-family:var(--mono);font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;}
+.algo-name{font-family:var(--serif);font-size:26px;letter-spacing:-0.02em;line-height:1.1;margin-bottom:6px;}
+.algo-desc{font-size:12px;color:var(--muted);line-height:1.65;}
+.c-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px;}
+.c-box{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 8px;text-align:center;}
+.c-lbl{font-family:var(--mono);font-size:8px;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
+.c-val{font-family:var(--mono);font-size:13px;font-weight:700;}
+.c-note{font-size:10px;color:var(--muted);margin-top:10px;line-height:1.6;font-style:italic;}
+
+/* ALGORITHM STEPS */
+.step-item{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border);}
+.step-item:last-child{border-bottom:none;}
+.step-num{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9px;font-weight:700;flex-shrink:0;margin-top:1px;}
+.step-action{font-family:var(--mono);font-size:10px;font-weight:600;margin-bottom:3px;}
+.step-detail{font-size:11px;color:var(--muted);line-height:1.55;}
+
+/* CONTROLS */
+.ctrl-lbl{font-family:var(--mono);font-size:9px;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px;}
+.ctrl-in{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:13px;font-weight:700;padding:8px 10px;width:100%;text-align:center;outline:none;transition:border-color 0.18s;}
+.ctrl-in:focus{border-color:var(--sel);}
+.ctrl-sel{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:10px;padding:8px 10px;width:100%;outline:none;cursor:pointer;}
+.btn-reset{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.04em;padding:10px;cursor:pointer;transition:all 0.18s;}
+.btn-reset:hover{background:var(--text);color:var(--surface);border-color:var(--text);}
+
+/* DISC ITEMS */
+.disc-item{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:10px;margin-bottom:8px;border-left:3px solid;font-size:11px;line-height:1.6;color:var(--text);}
+.disc-item:last-child{margin-bottom:0;}
+.disc-icon{font-size:15px;flex-shrink:0;margin-top:-1px;}
+.disc-b{font-weight:600;display:block;margin-bottom:2px;font-size:11px;}
+.disc-p{color:var(--muted);font-size:10.5px;line-height:1.55;}
+
+/* VIZ */
+.viz{display:flex;flex-direction:column;gap:16px;}
+.viz-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.viz-title{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);}
+.legend{display:flex;gap:10px;flex-wrap:wrap;}
+.leg{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:0.04em;}
+.leg-dot{width:10px;height:10px;border-radius:3px;}
+.step-badge{font-family:var(--mono);font-size:11px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:5px 12px;color:var(--muted);box-shadow:var(--sh-sm);}
+.step-badge b{color:var(--text);font-weight:700;}
+
+/* TIMELINE */
+.timeline{display:flex;flex-direction:column;gap:10px;}
+.tl-card{display:flex;gap:12px;align-items:flex-start;animation:tlin 0.28s cubic-bezier(0.22,1,0.36,1) forwards;opacity:0;}
+@keyframes tlin{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.tl-bullet{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;font-weight:700;flex-shrink:0;margin-top:3px;border:2px solid;position:relative;z-index:1;}
+.tl-box{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--sh-sm);transition:box-shadow 0.2s,border-color 0.2s;}
+.tl-box:hover{box-shadow:var(--sh);border-color:var(--border-strong);}
+.tl-meta{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 7px;border-bottom:1px solid var(--border);}
+.tl-type{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;}
+.tl-desc{font-size:11px;color:var(--muted);}
+.tl-viz{display:flex;align-items:flex-end;gap:3px;padding:14px 16px 10px;min-height:90px;}
+.bw{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;min-width:0;}
+.b{width:100%;max-width:44px;border-radius:5px 5px 2px 2px;min-height:4px;border:1.5px solid transparent;transition:all 0.25s ease;}
+.bv{font-family:var(--mono);font-size:8px;font-weight:600;color:var(--muted);}
+.b-def{background:#e8e6e0;border-color:#dbd8d0;}
+.b-srt{background:var(--srt-c);border-color:#16a34a;box-shadow:0 2px 8px rgba(34,197,94,0.25);}
+.b-swp{background:var(--swap-c);border-color:#dc2626;box-shadow:0 2px 10px rgba(239,68,68,0.3);}
+.b-cmp{background:var(--cmp-c);border-color:#d97706;box-shadow:0 2px 8px rgba(245,158,11,0.25);}
+.b-piv{background:var(--piv-c);border-color:#9333ea;box-shadow:0 2px 10px rgba(168,85,247,0.3);}
+.b-min{background:var(--min-c);border-color:#2563eb;box-shadow:0 2px 10px rgba(59,130,246,0.3);}
+
+/* ACTION BAR */
+.action-bar{position:sticky;bottom:16px;z-index:50;}
+.action-inner{background:rgba(255,255,255,0.95);backdrop-filter:blur(16px);border:1px solid var(--border);border-radius:16px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:var(--sh-lg);}
+.action-hint{font-size:11px;color:var(--muted);}
+.btn-next{display:flex;align-items:center;gap:8px;background:var(--text);color:#fff;border:none;border-radius:10px;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:0.06em;padding:12px 24px;cursor:pointer;transition:all 0.18s;box-shadow:0 4px 14px rgba(0,0,0,0.15);}
+.btn-next:hover{background:#333;transform:translateY(-1px);box-shadow:0 6px 18px rgba(0,0,0,0.2);}
+.btn-next:active{transform:translateY(0);}
+.btn-next.off{display:none;}
+.btn-arr{width:16px;height:16px;transition:transform 0.18s;}
+.btn-next:hover .btn-arr{transform:translateX(3px);}
+.done-wrap{width:100%;display:flex;align-items:center;justify-content:center;}
+.done-badge{display:inline-flex;align-items:center;gap:8px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:10px 20px;font-family:var(--mono);font-size:11px;font-weight:700;color:#15803d;letter-spacing:0.05em;}
+
+@media(max-width:900px){.wrap{grid-template-columns:1fr;}.sidebar{position:static;max-height:none;}.tabs{overflow-x:auto;}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr">
+    <div class="logo">
+      <div class="logo-mark">S/</div>
+      <div>
+        <div class="logo-name">SortLab</div>
+        <div class="logo-sub">Lab Algoritma · PTIK · Sorting Visualizer</div>
+      </div>
+    </div>
+    <div class="tabs">
+      <button class="tab active" data-a="selection" onclick="prepareAlgo('selection')">Selection</button>
+      <button class="tab" data-a="bubble"    onclick="prepareAlgo('bubble')">Bubble</button>
+      <button class="tab" data-a="insertion" onclick="prepareAlgo('insertion')">Insertion</button>
+      <button class="tab" data-a="quick"     onclick="prepareAlgo('quick')">Quicksort</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <aside class="sidebar">
+
+    <!-- Info -->
+    <div class="card">
+      <div class="card-hdr">
+        <span class="card-lbl">Algoritma Aktif</span>
+        <span id="algo-badge" class="algo-badge">O(?)</span>
+      </div>
+      <div class="card-body">
+        <div id="algo-name" class="algo-name">—</div>
+        <div id="algo-desc" class="algo-desc">Pilih algoritma dari navigasi atas.</div>
+        <div class="c-grid">
+          <div class="c-box"><div class="c-lbl">Best</div><div class="c-val" id="c-best" style="color:var(--srt-c)">—</div></div>
+          <div class="c-box"><div class="c-lbl">Average</div><div class="c-val" id="c-avg" style="color:var(--min-c)">—</div></div>
+          <div class="c-box"><div class="c-lbl">Worst</div><div class="c-val" id="c-worst" style="color:var(--swap-c)">—</div></div>
+        </div>
+        <p class="c-note" id="c-note"></p>
+      </div>
+    </div>
+
+    <!-- Steps -->
+    <div class="card" id="steps-card" style="display:none;">
+      <div class="card-hdr">
+        <span class="card-lbl">📋 Langkah-Langkah Algoritma</span>
+      </div>
+      <div class="card-body" style="padding-top:8px;padding-bottom:8px;">
+        <div id="steps-list"></div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="card">
+      <div class="card-hdr"><span class="card-lbl">Konfigurasi Simulasi</span></div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:10px;">
+        <div>
+          <label class="ctrl-lbl">Ukuran Data (4–15)</label>
+          <input type="number" id="data-count" class="ctrl-in" value="8" min="4" max="15">
+        </div>
+        <div id="quick-opts" style="display:none;">
+          <label class="ctrl-lbl">Strategi Pivot</label>
+          <select id="pivot-strategy" class="ctrl-sel" onchange="resetSim()">
+            <option value="last">Lomuto — Last Element</option>
+            <option value="first">First Element</option>
+            <option value="middle">Median / Middle Element</option>
+          </select>
+        </div>
+        <button class="btn-reset" onclick="resetSim()">↺ &nbsp;Reset &amp; Acak Data Baru</button>
+      </div>
+    </div>
+
+    <!-- Observasi -->
+    <div class="card" id="obs-card" style="display:none;">
+      <div class="card-hdr"><span class="card-lbl" style="color:var(--cmp-c);">⚡ Observasi Individu</span></div>
+      <div class="card-body" id="obs-body"></div>
+    </div>
+
+    <!-- Debat -->
+    <div class="card" id="debat-card" style="display:none;">
+      <div class="card-hdr"><span class="card-lbl" style="color:var(--ins);">🔥 Topik Debat Kelompok</span></div>
+      <div class="card-body" id="debat-body"></div>
+    </div>
+
+  </aside>
+
+  <section class="viz">
+    <div class="viz-top">
+      <div class="viz-title">Timeline Transformasi Data</div>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <div class="legend">
+          <div class="leg"><div class="leg-dot" style="background:var(--swap-c);"></div>SWAP</div>
+          <div class="leg"><div class="leg-dot" style="background:var(--cmp-c);"></div>COMPARE</div>
+          <div class="leg"><div class="leg-dot" style="background:var(--min-c);"></div>MIN/KEY</div>
+          <div class="leg"><div class="leg-dot" style="background:var(--piv-c);"></div>PIVOT</div>
+          <div class="leg"><div class="leg-dot" style="background:var(--srt-c);"></div>SORTED</div>
+        </div>
+        <div class="step-badge">Langkah: <b id="step-ctr">0</b></div>
+      </div>
+    </div>
+
+    <div id="timeline" class="timeline"></div>
+
+    <div class="action-bar">
+      <div class="action-inner">
+        <span class="action-hint" id="action-hint">Pilih algoritma dan tekan tombol untuk memulai.</span>
+        <button class="btn-next off" id="btn-next" onclick="triggerNext()">
+          Langkah Berikutnya
+          <svg class="btn-arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+        <div id="done-state" style="display:none;" class="done-wrap">
+          <div class="done-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+            SELESAI — Bandingkan jumlah langkah dengan teori Big-O!
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+let currentData=[], currentAlgo='', gen=null, stepCount=0;
+
+const META = {
+  selection:{
+    name:'Selection Sort',
+    desc:'Mencari elemen terkecil dari sisa array yang belum terurut, lalu menukarnya ke posisi paling depan. Diulang sampai seluruh array terurut.',
+    badge:'O(n²)', bBg:'#dbeafe', bTxt:'#1d4ed8',
+    best:'O(n²)', avg:'O(n²)', worst:'O(n²)',
+    note:'⚠️ Jumlah perbandingan selalu sama di semua kondisi — tidak ada mekanisme berhenti lebih awal.',
+    steps:[
+      {n:1, a:'SET i = 0', d:'Mulai dari posisi pertama. Posisi ini yang akan diisi elemen minimum.'},
+      {n:2, a:'SET minIndex = i', d:'Anggap elemen di posisi i adalah yang terkecil sementara.'},
+      {n:3, a:'LOOP j dari i+1 sampai akhir', d:'Telusuri sisa array untuk mencari elemen yang lebih kecil.'},
+      {n:4, a:'IF arr[j] < arr[minIndex]', d:'Jika ditemukan yang lebih kecil, update minIndex = j.'},
+      {n:5, a:'SWAP arr[i] ↔ arr[minIndex]', d:'Setelah scan selesai, tukar posisi i dengan minIndex (jika berbeda).'},
+      {n:6, a:'i++ → ULANGI', d:'Posisi i sekarang terkunci. Lanjut ke posisi i+1 dan ulangi proses.'},
+    ],
+    obs:[
+      {icon:'🔵', b:'Amati perubahan "min sementara"', p:'Perhatikan bar warna biru (minIndex). Apakah setiap scan selalu diakhiri swap? Ada kondisi di mana swap tidak terjadi — kapan?'},
+      {icon:'📐', b:'Hitung total perbandingan', p:'Untuk n=8 elemen, berapa total perbandingan? Cocokkan dengan rumus n×(n−1)/2. Apakah hasilnya sama untuk data terurut vs acak?'},
+    ],
+    debat:[
+      {icon:'💾', b:'Kapan "swap sedikit" itu benar-benar penting?', p:'Selection Sort unggul dalam jumlah swap: maksimal hanya n−1 kali. Diskusikan relevansinya pada EEPROM (memori flash di mikrokontroler) yang punya batas siklus tulis. Apakah ini pertimbangan nyata di era modern?'},
+      {icon:'🆚', b:'Selection vs Bubble: siapa lebih buruk?', p:'Keduanya O(n²), tapi ada perbedaan penting. Hitung: mana yang lebih banyak melakukan swap? Mana yang bisa berhenti lebih awal? Simulasikan dengan data yang sudah terurut dan bandingkan hasilnya.'},
+      {icon:'🔧', b:'Modifikasi: Double Selection Sort', p:'Bisakah kamu modifikasi algoritma ini agar mencari nilai MIN dan MAX sekaligus dalam satu pass, lalu menaruhnya di kedua ujung? Diskusikan apakah ini benar-benar mengurangi waktu eksekusi.'},
+    ]
+  },
+
+  bubble:{
+    name:'Bubble Sort',
+    desc:'Membandingkan pasangan elemen bertetangga. Jika urutan salah, tukar. Elemen terbesar "menggelembung" ke kanan setiap iterasi — seperti gelembung udara naik ke permukaan air.',
+    badge:'O(n²)', bBg:'#fee2e2', bTxt:'#b91c1c',
+    best:'O(n)', avg:'O(n²)', worst:'O(n²)',
+    note:'✅ Dengan optimasi flag swap, best-case menjadi O(n) untuk data yang sudah terurut.',
+    steps:[
+      {n:1, a:'SET i = 0 (pass ke-i)', d:'Setiap pass akan mengapungkan 1 elemen terbesar ke posisi akhirnya.'},
+      {n:2, a:'LOOP j dari 0 sampai n−i−2', d:'Batas atas berkurang setiap pass karena ujung kanan sudah terurut.'},
+      {n:3, a:'IF arr[j] > arr[j+1]', d:'Bandingkan dua elemen bertetangga.'},
+      {n:4, a:'SWAP arr[j] ↔ arr[j+1]', d:'Tukar jika urutan salah. Tandai bahwa ada swap (swapped = true).'},
+      {n:5, a:'CEK FLAG: ada swap?', d:'Jika tidak ada swap sama sekali dalam satu pass → data sudah terurut → STOP (early exit).'},
+      {n:6, a:'i++ → ULANGI', d:'Elemen terbesar sudah di posisi akhir. Kurangi batas, ulangi pass berikutnya.'},
+    ],
+    obs:[
+      {icon:'🫧', b:'Efek "gelembung"', p:'Mengapa nilai terbesar selalu sampai paling kanan lebih dulu? Karena ia menang di setiap perbandingan dan terus terdorong ke kanan hingga posisi finalnya.'},
+      {icon:'🐢', b:'"Turtle element" problem', p:'Nilai kecil di posisi kanan hanya bergerak 1 langkah ke kiri per pass. Coba posisikan nilai terkecil di posisi paling kanan — berapa pass dibutuhkan sampai ia sampai ke posisi benar?'},
+    ],
+    debat:[
+      {icon:'🦺', b:'Satu skenario nyata Bubble Sort berguna', p:'Bubble Sort sering dihina, tapi ada skenario di mana ia bisa dibenarkan: data streaming yang nearly-sorted (hampir terurut). Pikirkan contoh: log transaksi real-time, sensor data, atau antrian pesan. Mana yang paling masuk akal?'},
+      {icon:'⚖️', b:'Stable sort: sepele atau krusial?', p:'Bubble Sort bersifat "stable" — elemen bernilai sama tidak bertukar posisi. Cari skenario di mana ini penting! Contoh awal: sort nama mahasiswa berdasarkan nilai, lalu sort lagi berdasarkan kelas. Apakah urutan nama tetap terjaga?'},
+      {icon:'🚀', b:'Optimasi flag: berapa persen lebih cepat?', p:'Implementasikan Bubble Sort dengan dan tanpa flag. Ukur pada tiga kondisi: data sudah terurut, data terbalik, dan data acak. Buat tabel perbandingan jumlah operasi. Kapan optimasi flag paling signifikan?'},
+    ]
+  },
+
+  insertion:{
+    name:'Insertion Sort',
+    desc:'Membangun array terurut satu demi satu. Setiap elemen baru "disisipkan" ke posisi yang tepat dalam bagian yang sudah terurut — persis seperti menyortir kartu remi di tangan.',
+    badge:'O(n²)', bBg:'#dcfce7', bTxt:'#15803d',
+    best:'O(n)', avg:'O(n²)', worst:'O(n²)',
+    note:'✅ Sangat efisien untuk dataset kecil (n < 20) atau data yang hampir terurut.',
+    steps:[
+      {n:1, a:'MULAI dari i = 1', d:'Elemen pertama (index 0) dianggap sudah terurut sendiri.'},
+      {n:2, a:'key = arr[i]', d:'Simpan elemen saat ini sebagai "kunci" yang akan disisipkan.'},
+      {n:3, a:'SET j = i − 1', d:'j menunjuk elemen terakhir dari bagian yang sudah terurut.'},
+      {n:4, a:'WHILE arr[j] > key AND j ≥ 0', d:'Selama ada elemen lebih besar dari key di sebelah kiri...'},
+      {n:5, a:'GESER: arr[j+1] = arr[j], j−−', d:'Geser elemen ke kanan untuk membuat ruang bagi key.'},
+      {n:6, a:'SISIPKAN: arr[j+1] = key', d:'Tempatkan key di posisi yang tepat. i++, ulangi untuk elemen berikutnya.'},
+    ],
+    obs:[
+      {icon:'🃏', b:'Analogi kartu remi', p:'Bayangkan kamu menerima kartu satu per satu dan langsung menyortirnya di tangan. Itulah Insertion Sort! Coba lakukan secara manual dengan 5 kartu — rasakan bedanya dibanding Selection Sort.'},
+      {icon:'📦', b:'Shift vs Swap: mana lebih hemat?', p:'Insertion Sort menggunakan SHIFT (1 operasi tulis), bukan SWAP (butuh 3 operasi: temp, a=b, b=temp). Hitung total penghematan operasi memori untuk n=10 elemen pada kondisi worst-case.'},
+    ],
+    debat:[
+      {icon:'⚡', b:'Kenapa library modern pakai Insertion Sort?', p:'Python (Timsort), Java (DualPivot), dan V8 JavaScript Engine menggunakan Insertion Sort untuk sub-array berukuran kecil (biasanya n < 10–32). Cari tahu ambang batas pastinya dan jelaskan: mengapa Quicksort justru kalah untuk ukuran kecil?'},
+      {icon:'🔍', b:'Binary Insertion Sort: lebih cepat?', p:'Gunakan Binary Search untuk mencari posisi sisip — dari O(n) menjadi O(log n) perbandingan per elemen. Implementasikan dan ukur. Apakah time complexity secara keseluruhan berubah? Diskusikan perbedaan antara "comparison complexity" dan "movement complexity".'},
+      {icon:'📡', b:'Online algorithm: relevan di mana?', p:'Insertion Sort adalah "online algorithm" — bisa proses data real-time saat data baru masuk satu per satu. Debatkan 3 skenario: leaderboard game online, antrian rumah sakit darurat, feed media sosial berdasarkan waktu. Mana yang paling cocok dan mengapa?'},
+    ]
+  },
+
+  quick:{
+    name:'Quicksort',
+    desc:'Algoritma divide-and-conquer. Pilih satu "pivot", partisi array sehingga semua elemen lebih kecil dari pivot ada di kiri dan lebih besar ada di kanan. Ulangi secara rekursif.',
+    badge:'O(n log n)', bBg:'#fef3c7', bTxt:'#b45309',
+    best:'O(n log n)', avg:'O(n log n)', worst:'O(n²)',
+    note:'⚠️ Worst-case O(n²) terjadi jika pivot selalu terpilih sebagai nilai terkecil/terbesar (array sudah terurut + pivot = last element).',
+    steps:[
+      {n:1, a:'PILIH PIVOT', d:'Tentukan elemen pivot berdasarkan strategi (last, first, atau middle).'},
+      {n:2, a:'PARTISI ARRAY', d:'Pindahkan semua elemen < pivot ke kiri, semua elemen > pivot ke kanan dari pivot.'},
+      {n:3, a:'TEMPATKAN PIVOT', d:'Pivot kini berada di posisi finalnya yang benar — tidak akan bergerak lagi.'},
+      {n:4, a:'REKURSI KIRI', d:'Terapkan Quicksort pada sub-array kiri (semua elemen < pivot).'},
+      {n:5, a:'REKURSI KANAN', d:'Terapkan Quicksort pada sub-array kanan (semua elemen > pivot).'},
+      {n:6, a:'BASE CASE → SELESAI', d:'Berhenti jika sub-array berukuran 0 atau 1 — sudah pasti terurut.'},
+    ],
+    obs:[
+      {icon:'📌', b:'Pivot selalu ke posisi final', p:'Amati elemen ungu (pivot). Setelah proses partisi, pivot LANGSUNG berada di posisi finalnya yang benar dan tidak bergerak lagi. Ini properti kunci Quicksort — berbeda dengan algoritma lain!'},
+      {icon:'🌳', b:'Pohon rekursi & keseimbangan', p:'Bandingkan strategi "Last" vs "Middle" pada data yang sama. Strategi mana yang menghasilkan lebih sedikit total langkah? Mengapa keseimbangan partisi sangat memengaruhi performa?'},
+    ],
+    debat:[
+      {icon:'🎯', b:'Pivot acak vs deterministik: trade-off nyata', p:'Randomized Quicksort menggunakan pivot acak untuk menghindari worst-case. Tapi random number generation butuh waktu CPU. Untuk n=1.000.000 elemen, apakah overhead ini signifikan? Kapan Median-of-Three lebih baik dari random pivot?'},
+      {icon:'⚔️', b:'Quicksort vs Merge Sort: pilih satu untuk project', p:'Quicksort: rata-rata O(n log n), in-place, tapi worst-case O(n²). Merge Sort: O(n log n) guaranteed, tapi butuh O(n) memori extra. Jika kamu membangun fitur sort untuk aplikasi mobile dengan RAM terbatas, mana yang kamu pilih? Justifikasi dengan angka!'},
+      {icon:'🛡️', b:'Serangan DoS via algorithmic complexity', p:'Jika kamu tahu sistem menggunakan last-element pivot, kamu bisa kirim data terurut untuk memicu worst-case O(n²) dan membuat server lambat. Ini bukan teori — sudah terjadi di dunia nyata (CVE pada Perl, PHP, Java sebelum tahun 2012). Diskusikan cara mitigasinya!'},
+    ]
+  }
+};
+
+function prepareAlgo(type) {
+  currentAlgo = type;
+  const m = META[type];
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.a === type));
+
+  const badge = document.getElementById('algo-badge');
+  badge.textContent = m.badge; badge.style.background = m.bBg; badge.style.color = m.bTxt;
+  document.getElementById('algo-name').textContent = m.name;
+  document.getElementById('algo-desc').textContent = m.desc;
+  document.getElementById('c-best').textContent = m.best;
+  document.getElementById('c-avg').textContent  = m.avg;
+  document.getElementById('c-worst').textContent = m.worst;
+  document.getElementById('c-note').textContent  = m.note;
+
+  document.getElementById('steps-card').style.display = '';
+  document.getElementById('steps-list').innerHTML = m.steps.map(s=>`
+    <div class="step-item">
+      <div class="step-num" style="background:${m.bBg};color:${m.bTxt};">${s.n}</div>
+      <div><div class="step-action" style="color:${m.bTxt};">${s.a}</div><div class="step-detail">${s.d}</div></div>
+    </div>`).join('');
+
+  document.getElementById('obs-card').style.display = '';
+  document.getElementById('obs-body').innerHTML = m.obs.map(o=>`
+    <div class="disc-item" style="border-color:var(--cmp-c);background:#fffbeb;">
+      <span class="disc-icon">${o.icon}</span>
+      <div><span class="disc-b">${o.b}</span><p class="disc-p">${o.p}</p></div>
+    </div>`).join('');
+
+  document.getElementById('debat-card').style.display = '';
+  document.getElementById('debat-body').innerHTML = m.debat.map(d=>`
+    <div class="disc-item" style="border-color:var(--ins);background:var(--ins-light);">
+      <span class="disc-icon">${d.icon}</span>
+      <div><span class="disc-b">${d.b}</span><p class="disc-p">${d.p}</p></div>
+    </div>`).join('');
+
+  document.getElementById('quick-opts').style.display = type==='quick' ? '' : 'none';
+  resetSim();
+}
+
+function resetSim() {
+  const n = Math.max(4, Math.min(15, parseInt(document.getElementById('data-count').value)||8));
+  let s = new Set();
+  while(s.size < n) s.add(Math.floor(Math.random()*50)+5);
+  currentData = Array.from(s);
+  document.getElementById('timeline').innerHTML = '';
+  stepCount = 0;
+  document.getElementById('step-ctr').textContent = '0';
+  document.getElementById('done-state').style.display = 'none';
+  document.getElementById('btn-next').classList.remove('off');
+  document.getElementById('action-hint').textContent = 'Klik tombol untuk menjalankan langkah demi langkah.';
+  addCard('INIT','Inisialisasi','Data acak digenerate. Siap memulai simulasi.',[...currentData]);
+  if(currentAlgo==='selection') gen=selGen([...currentData]);
+  else if(currentAlgo==='bubble') gen=bubGen([...currentData]);
+  else if(currentAlgo==='insertion') gen=insGen([...currentData]);
+  else if(currentAlgo==='quick') gen=qkGen([...currentData],document.getElementById('pivot-strategy').value);
+}
+
+function triggerNext() {
+  if(!gen) return;
+  const r = gen.next();
+  if(r.done){
+    document.getElementById('btn-next').classList.add('off');
+    document.getElementById('done-state').style.display='';
+    document.getElementById('action-hint').textContent='';
+  } else {
+    stepCount++;
+    document.getElementById('step-ctr').textContent=stepCount;
+  }
+  setTimeout(()=>document.getElementById('timeline').lastElementChild?.scrollIntoView({behavior:'smooth',block:'nearest'}),50);
+}
+
+function addCard(type,title,desc,data,hi={}){
+  const tl=document.getElementById('timeline');
+  const el=document.createElement('div');
+  el.className='tl-card';
+
+  const isSwap=['SWAP','GELEMBUNG'].includes(type);
+  const isSorted=['SORTED','SELESAI','FIXED','INSERT','TERKUNCI'].includes(type);
+  const isPivot=type==='PIVOT';
+  const isMin=['MIN','PICK'].includes(type);
+
+  const bBg=isSwap?'#fee2e2':isSorted?'#dcfce7':isPivot?'#f3e8ff':isMin?'#dbeafe':'#f2f1ee';
+  const bBorder=isSwap?'#fca5a5':isSorted?'#86efac':isPivot?'#d8b4fe':isMin?'#93c5fd':'#e4e2dc';
+  const bColor=isSwap?'#dc2626':isSorted?'#16a34a':isPivot?'#9333ea':isMin?'#2563eb':'#8a8780';
+  const tColor=isSwap?'var(--swap-c)':isSorted?'var(--srt-c)':isPivot?'var(--piv-c)':isMin?'var(--min-c)':['COMPARE','SKIP','SCANNING'].includes(type)?'var(--cmp-c)':'var(--muted)';
+
+  const maxV=Math.max(...data);
+  const bars=data.map((v,i)=>{
+    let cls='b-def';
+    if(hi.pivot?.includes(i)) cls='b-piv';
+    else if(hi.swap?.includes(i)) cls='b-swp';
+    else if(hi.compare?.includes(i)) cls='b-cmp';
+    else if(hi.min?.includes(i)) cls='b-min';
+    else if(hi.sorted?.includes(i)) cls='b-srt';
+    const h=Math.max(6,Math.round((v/maxV)*72));
+    return `<div class="bw"><div class="b ${cls}" style="height:${h}px;"></div><div class="bv">${v}</div></div>`;
+  }).join('');
+
+  el.innerHTML=`
+    <div class="tl-bullet" style="background:${bBg};border-color:${bBorder};color:${bColor};">${stepCount}</div>
+    <div class="tl-box">
+      <div class="tl-meta">
+        <span class="tl-type" style="color:${tColor};">${title}</span>
+        <span class="tl-desc">${desc}</span>
+      </div>
+      <div class="tl-viz">${bars}</div>
+    </div>`;
+  tl.appendChild(el);
+}
+
+function* selGen(arr){
+  for(let i=0;i<arr.length-1;i++){
+    let min=i;
+    const srt=Array.from({length:i},(_,k)=>k);
+    yield addCard('SCAN',`SCAN #${i+1}`,`Cari minimum untuk posisi [${i}]`,[...arr],{sorted:srt,compare:[i]});
+    for(let j=i+1;j<arr.length;j++){
+      if(arr[j]<arr[min]){min=j;yield addCard('MIN','UPDATE MIN',`${arr[min]} adalah minimum baru`,[...arr],{min:[j],sorted:srt});}
+      else{yield addCard('COMPARE','BANDINGKAN',`${arr[j]} ≥ ${arr[min]}, bukan minimum`,[...arr],{compare:[j],min:[min],sorted:srt});}
+    }
+    if(min!==i){yield addCard('SWAP','SWAP',`Tukar ${arr[i]} ↔ ${arr[min]}`,[...arr],{swap:[i,min],sorted:srt});[arr[i],arr[min]]=[arr[min],arr[i]];}
+    yield addCard('SORTED','TERKUNCI',`Posisi [${i}] = ${arr[i]} ✓`,[...arr],{sorted:Array.from({length:i+1},(_,k)=>k)});
+  }
+  yield addCard('SELESAI','SELESAI','Seluruh array telah terurut!',[...arr],{sorted:arr.map((_,i)=>i)});
+}
+
+function* bubGen(arr){
+  for(let i=0;i<arr.length;i++){
+    let sw=false;
+    for(let j=0;j<arr.length-i-1;j++){
+      if(arr[j]>arr[j+1]){
+        yield addCard('SWAP','GELEMBUNGKAN',`${arr[j]} > ${arr[j+1]} → tukar`,[...arr],{swap:[j,j+1]});
+        [arr[j],arr[j+1]]=[arr[j+1],arr[j]];sw=true;
+      }else{yield addCard('COMPARE','AMAN',`${arr[j]} ≤ ${arr[j+1]} → tidak perlu tukar`,[...arr],{compare:[j,j+1]});}
+    }
+    if(!sw){yield addCard('SELESAI','EARLY STOP','Tidak ada swap → data sudah terurut!',[...arr],{sorted:arr.map((_,i)=>i)});return;}
+    yield addCard('SORTED','PASS SELESAI',`${arr[arr.length-i-1]} terkunci ✓`,[...arr],{sorted:Array.from({length:i+1},(_,k)=>arr.length-1-k)});
+  }
+}
+
+function* insGen(arr){
+  for(let i=1;i<arr.length;i++){
+    const key=arr[i];let j=i-1;
+    const srt=Array.from({length:i},(_,k)=>k);
+    yield addCard('PICK','AMBIL KUNCI',`Kunci: ${key} — akan disisipkan ke posisi tepat`,[...arr],{min:[i],sorted:srt});
+    while(j>=0&&arr[j]>key){
+      yield addCard('SWAP','GESER',`${arr[j]} > ${key} → geser ke kanan`,[...arr],{swap:[j,j+1],sorted:Array.from({length:i},(_,k)=>k)});
+      arr[j+1]=arr[j];j--;
+    }
+    arr[j+1]=key;
+    yield addCard('INSERT','SISIPKAN',`${key} masuk di posisi [${j+1}] ✓`,[...arr],{sorted:Array.from({length:i+1},(_,k)=>k)});
+  }
+  yield addCard('SELESAI','SELESAI','Semua elemen disisipkan ke posisi benar!',[...arr],{sorted:arr.map((_,i)=>i)});
+}
+
+function* qkGen(arr,strat){
+  const stack=[[0,arr.length-1]];
+  const fixed=new Set();
+  while(stack.length>0){
+    const[l,h]=stack.pop();
+    if(l<h){
+      let pIdx=strat==='last'?h:strat==='first'?l:Math.floor((l+h)/2);
+      yield addCard('PIVOT','PILIH PIVOT',`Pivot = ${arr[pIdx]} (index ${pIdx})`,[...arr],{pivot:[pIdx],sorted:Array.from(fixed)});
+      [arr[pIdx],arr[h]]=[arr[h],arr[pIdx]];
+      const pv=arr[h];let i=l-1;
+      for(let j=l;j<h;j++){
+        if(arr[j]<pv){i++;[arr[i],arr[j]]=[arr[j],arr[i]];yield addCard('SWAP','PARTISI',`${arr[i]} < pivot(${pv}) → pindah ke kiri`,[...arr],{swap:[i,j],pivot:[h],sorted:Array.from(fixed)});}
+      }
+      [arr[i+1],arr[h]]=[arr[h],arr[i+1]];fixed.add(i+1);
+      stack.push([i+2,h]);stack.push([l,i]);
+      yield addCard('FIXED','PIVOT TERKUNCI',`Pivot ${pv} di posisi final [${i+1}] ✓`,[...arr],{sorted:Array.from(fixed)});
+    }else if(l===h) fixed.add(l);
+  }
+  yield addCard('SELESAI','SELESAI','Semua partisi selesai — array terurut penuh!',[...arr],{sorted:arr.map((_,i)=>i)});
+}
+
+window.onload=()=>prepareAlgo('selection');
+</script>
+</body>
+</html>
