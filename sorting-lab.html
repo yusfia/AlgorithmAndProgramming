@@ -48,6 +48,8 @@ body::before{
 /* HEADER */
 header{position:sticky;top:0;z-index:100;background:rgba(247,246,243,0.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 28px;box-shadow:var(--sh-sm);}
 .hdr{max-width:1440px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:58px;gap:16px;}
+.sidebar-btn{background:var(--surface2);border:1px solid var(--border);border-radius:8px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:14px;cursor:pointer;transition:all 0.18s;}
+.sidebar-btn:hover{background:var(--surface);}
 .logo{display:flex;align-items:center;gap:10px;}
 .logo-mark{width:36px;height:36px;background:var(--text);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:-0.04em;}
 .logo-name{font-family:var(--serif);font-size:22px;color:var(--text);letter-spacing:-0.01em;line-height:1;}
@@ -64,12 +66,14 @@ header{position:sticky;top:0;z-index:100;background:rgba(247,246,243,0.92);backd
 
 /* LAYOUT */
 .wrap{max-width:1440px;margin:0 auto;padding:24px 28px;display:grid;grid-template-columns:360px 1fr;gap:22px;position:relative;z-index:1;}
+.wrap.sidebar-hidden .sidebar{display:none;}
+.wrap.sidebar-hidden{grid-template-columns:1fr;}
 
 /* SIDEBAR */
 .sidebar{display:flex;flex-direction:column;gap:14px;position:sticky;top:72px;max-height:calc(100vh - 90px);overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border-strong) transparent;padding-right:4px;}
 
 /* CARDS */
-.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--sh-sm);}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--sh-sm);}
 .card-hdr{padding:11px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
 .card-lbl{font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);}
 .card-body{padding:16px;}
@@ -150,7 +154,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(247,246,243,0.92);backd
 .done-wrap{width:100%;display:flex;align-items:center;justify-content:center;}
 .done-badge{display:inline-flex;align-items:center;gap:8px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:10px 20px;font-family:var(--mono);font-size:11px;font-weight:700;color:#15803d;letter-spacing:0.05em;}
 
-@media(max-width:900px){.wrap{grid-template-columns:1fr;}.sidebar{position:static;max-height:none;}.tabs{overflow-x:auto;}}
+@media(max-width:900px){.wrap{grid-template-columns:1fr;}.sidebar{position:static;max-height:none;}.tabs{overflow-x:auto;}.action-bar{position:static;}}
 </style>
 </head>
 <body>
@@ -164,6 +168,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(247,246,243,0.92);backd
         <div class="logo-sub">Lab Algoritma · PTIK · Sorting Visualizer</div>
       </div>
     </div>
+    <button id="sidebar-toggle" class="sidebar-btn">☰</button>
     <div class="tabs">
       <button class="tab active" data-a="selection" onclick="prepareAlgo('selection')">Selection</button>
       <button class="tab" data-a="bubble"    onclick="prepareAlgo('bubble')">Bubble</button>
@@ -296,7 +301,7 @@ const META = {
       {icon:'📐', b:'Hitung total perbandingan', p:'Untuk n=8 elemen, berapa total perbandingan? Cocokkan dengan rumus n×(n−1)/2. Apakah hasilnya sama untuk data terurut vs acak?'},
     ],
     debat:[
-      {icon:'💾', b:'Kapan "swap sedikit" itu benar-benar penting?', p:'Selection Sort unggul dalam jumlah swap: maksimal hanya n−1 kali. Diskusikan relevansinya pada EEPROM (memori flash di mikrokontroler) yang punya batas siklus tulis. Apakah ini pertimbangan nyata di era modern?'},
+      {icon:'💾', b:'Kapan "swap sedikit" itu benar-benar penting?', p:'Selection Sort unggul dalam jumlah swap: maksimal hanya n−1 kali. Diskusikan relevansi pada EEPROM (memori flash di mikrokontroler) yang punya batas siklus tulis. Apakah ini pertimbangan nyata di era modern?'},
       {icon:'🆚', b:'Selection vs Bubble: siapa lebih buruk?', p:'Keduanya O(n²), tapi ada perbedaan penting. Hitung: mana yang lebih banyak melakukan swap? Mana yang bisa berhenti lebih awal? Simulasikan dengan data yang sudah terurut dan bandingkan hasilnya.'},
       {icon:'🔧', b:'Modifikasi: Double Selection Sort', p:'Bisakah kamu modifikasi algoritma ini agar mencari nilai MIN dan MAX sekaligus dalam satu pass, lalu menaruhnya di kedua ujung? Diskusikan apakah ini benar-benar mengurangi waktu eksekusi.'},
     ]
@@ -554,6 +559,13 @@ function* qkGen(arr,strat){
 }
 
 window.onload=()=>prepareAlgo('selection');
+
+document.getElementById('sidebar-toggle').addEventListener('click', () => {
+  const wrap = document.querySelector('.wrap');
+  const btn = document.getElementById('sidebar-toggle');
+  wrap.classList.toggle('sidebar-hidden');
+  btn.textContent = wrap.classList.contains('sidebar-hidden') ? '✕' : '☰';
+});
 </script>
 </body>
 </html>
