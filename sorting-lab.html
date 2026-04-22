@@ -288,6 +288,7 @@ const META = {
     badge:'O(n²)', bBg:'#dbeafe', bTxt:'#1d4ed8',
     best:'O(n²)', avg:'O(n²)', worst:'O(n²)',
     note:'⚠️ Jumlah perbandingan selalu sama di semua kondisi — tidak ada mekanisme berhenti lebih awal.',
+
     steps:[
       {n:1, a:'SET i = 0', d:'Mulai dari posisi pertama. Posisi ini yang akan diisi elemen minimum.'},
       {n:2, a:'SET minIndex = i', d:'Anggap elemen di posisi i adalah yang terkecil sementara.'},
@@ -296,89 +297,104 @@ const META = {
       {n:5, a:'SWAP arr[i] ↔ arr[minIndex]', d:'Setelah scan selesai, tukar posisi i dengan minIndex (jika berbeda).'},
       {n:6, a:'i++ → ULANGI', d:'Posisi i sekarang terkunci. Lanjut ke posisi i+1 dan ulangi proses.'},
     ],
+
     obs:[
-      {icon:'🔵', b:'Amati perubahan "min sementara"', p:'Perhatikan bar warna biru (minIndex). Apakah setiap scan selalu diakhiri swap? Ada kondisi di mana swap tidak terjadi — kapan?'},
-      {icon:'📐', b:'Hitung total perbandingan', p:'Untuk n=8 elemen, berapa total perbandingan? Cocokkan dengan rumus n×(n−1)/2. Apakah hasilnya sama untuk data terurut vs acak?'},
+      {icon:'👀', b:'Pola yang terlihat', p:'Apakah nilai minimum selalu ditemukan di akhir scanning? Apa implikasinya terhadap jumlah langkah?'},
+      {icon:'📊', b:'Jumlah perbandingan', p:'Bandingkan jumlah perbandingan pada data acak vs terurut. Apakah berubah?'},
+      {icon:'🔁', b:'Swap vs Compare', p:'Mana yang lebih dominan: swap atau compare? Apa artinya terhadap efisiensi?'},
     ],
+
     debat:[
-      {icon:'💾', b:'Kapan "swap sedikit" itu benar-benar penting?', p:'Selection Sort unggul dalam jumlah swap: maksimal hanya n−1 kali. Diskusikan relevansi pada EEPROM (memori flash di mikrokontroler) yang punya batas siklus tulis. Apakah ini pertimbangan nyata di era modern?'},
-      {icon:'🆚', b:'Selection vs Bubble: siapa lebih buruk?', p:'Keduanya O(n²), tapi ada perbedaan penting. Hitung: mana yang lebih banyak melakukan swap? Mana yang bisa berhenti lebih awal? Simulasikan dengan data yang sudah terurut dan bandingkan hasilnya.'},
-      {icon:'🔧', b:'Modifikasi: Double Selection Sort', p:'Bisakah kamu modifikasi algoritma ini agar mencari nilai MIN dan MAX sekaligus dalam satu pass, lalu menaruhnya di kedua ujung? Diskusikan apakah ini benar-benar mengurangi waktu eksekusi.'},
+      {icon:'⚖️', b:'Efisiensi nyata', p:'Dalam kondisi apa Selection Sort masih layak digunakan walaupun O(n²)?'},
+      {icon:'🧠', b:'Modifikasi algoritma', p:'Bagaimana jika mencari MIN dan MAX sekaligus? Apakah benar-benar lebih cepat?'},
+      {icon:'🎯', b:'Pemilihan algoritma', p:'Jika dibandingkan dengan Bubble dan Insertion, kapan Selection lebih dipilih? Jelaskan.'},
     ]
   },
 
   bubble:{
     name:'Bubble Sort',
-    desc:'Membandingkan pasangan elemen bertetangga. Jika urutan salah, tukar. Elemen terbesar "menggelembung" ke kanan setiap iterasi — seperti gelembung udara naik ke permukaan air.',
+    desc:'Membandingkan pasangan elemen bertetangga. Jika urutan salah, tukar.',
     badge:'O(n²)', bBg:'#fee2e2', bTxt:'#b91c1c',
     best:'O(n)', avg:'O(n²)', worst:'O(n²)',
-    note:'✅ Dengan optimasi flag swap, best-case menjadi O(n) untuk data yang sudah terurut.',
+    note:'✅ Bisa berhenti lebih cepat jika tidak ada swap.',
+
     steps:[
       {n:1, a:'SET i = 0 (pass ke-i)', d:'Setiap pass akan mengapungkan 1 elemen terbesar ke posisi akhirnya.'},
-      {n:2, a:'LOOP j dari 0 sampai n−i−2', d:'Batas atas berkurang setiap pass karena ujung kanan sudah terurut.'},
-      {n:3, a:'IF arr[j] > arr[j+1]', d:'Bandingkan dua elemen bertetangga.'},
-      {n:4, a:'SWAP arr[j] ↔ arr[j+1]', d:'Tukar jika urutan salah. Tandai bahwa ada swap (swapped = true).'},
-      {n:5, a:'CEK FLAG: ada swap?', d:'Jika tidak ada swap sama sekali dalam satu pass → data sudah terurut → STOP (early exit).'},
-      {n:6, a:'i++ → ULANGI', d:'Elemen terbesar sudah di posisi akhir. Kurangi batas, ulangi pass berikutnya.'},
+      {n:2, a:'LOOP j dari 0 sampai n−i−2', d:'Batas atas berkurang setiap pass.'},
+      {n:3, a:'IF arr[j] > arr[j+1]', d:'Bandingkan dua elemen.'},
+      {n:4, a:'SWAP arr[j] ↔ arr[j+1]', d:'Tukar jika salah.'},
+      {n:5, a:'CEK FLAG', d:'Jika tidak ada swap → berhenti.'},
+      {n:6, a:'ULANGI', d:'Lanjut ke pass berikutnya.'},
     ],
+
     obs:[
-      {icon:'🫧', b:'Efek "gelembung"', p:'Mengapa nilai terbesar selalu sampai paling kanan lebih dulu? Karena ia menang di setiap perbandingan dan terus terdorong ke kanan hingga posisi finalnya.'},
-      {icon:'🐢', b:'"Turtle element" problem', p:'Nilai kecil di posisi kanan hanya bergerak 1 langkah ke kiri per pass. Coba posisikan nilai terkecil di posisi paling kanan — berapa pass dibutuhkan sampai ia sampai ke posisi benar?'},
+      {icon:'👀', b:'Pergerakan elemen', p:'Mengapa nilai besar cepat ke kanan, tetapi nilai kecil lambat ke kiri?'},
+      {icon:'🐢', b:'Kasus ekstrem', p:'Jika nilai terkecil di kanan, berapa lama mencapai posisi benar?'},
+      {icon:'⚡', b:'Early stop', p:'Kapan algoritma berhenti lebih awal? Apa indikatornya?'},
     ],
+
     debat:[
-      {icon:'🦺', b:'Satu skenario nyata Bubble Sort berguna', p:'Bubble Sort sering dihina, tapi ada skenario di mana ia bisa dibenarkan: data streaming yang nearly-sorted (hampir terurut). Pikirkan contoh: log transaksi real-time, sensor data, atau antrian pesan. Mana yang paling masuk akal?'},
-      {icon:'⚖️', b:'Stable sort: sepele atau krusial?', p:'Bubble Sort bersifat "stable" — elemen bernilai sama tidak bertukar posisi. Cari skenario di mana ini penting! Contoh awal: sort nama mahasiswa berdasarkan nilai, lalu sort lagi berdasarkan kelas. Apakah urutan nama tetap terjaga?'},
-      {icon:'🚀', b:'Optimasi flag: berapa persen lebih cepat?', p:'Implementasikan Bubble Sort dengan dan tanpa flag. Ukur pada tiga kondisi: data sudah terurut, data terbalik, dan data acak. Buat tabel perbandingan jumlah operasi. Kapan optimasi flag paling signifikan?'},
+      {icon:'📉', b:'Efisiensi praktis', p:'Apakah Bubble Sort bisa efisien pada kondisi tertentu? Berikan contoh.'},
+      {icon:'🔍', b:'Stabilitas', p:'Kapan sifat stable benar-benar penting dalam sorting?'},
+      {icon:'⚔️', b:'Perbandingan', p:'Bandingkan dengan Insertion pada data hampir terurut. Mana lebih baik dan kenapa?'},
     ]
   },
 
   insertion:{
     name:'Insertion Sort',
-    desc:'Membangun array terurut satu demi satu. Setiap elemen baru "disisipkan" ke posisi yang tepat dalam bagian yang sudah terurut — persis seperti menyortir kartu remi di tangan.',
+    desc:'Menyisipkan elemen ke posisi yang tepat.',
     badge:'O(n²)', bBg:'#dcfce7', bTxt:'#15803d',
     best:'O(n)', avg:'O(n²)', worst:'O(n²)',
-    note:'✅ Sangat efisien untuk dataset kecil (n < 20) atau data yang hampir terurut.',
+    note:'Efisien untuk data kecil atau hampir terurut.',
+
     steps:[
-      {n:1, a:'MULAI dari i = 1', d:'Elemen pertama (index 0) dianggap sudah terurut sendiri.'},
-      {n:2, a:'key = arr[i]', d:'Simpan elemen saat ini sebagai "kunci" yang akan disisipkan.'},
-      {n:3, a:'SET j = i − 1', d:'j menunjuk elemen terakhir dari bagian yang sudah terurut.'},
-      {n:4, a:'WHILE arr[j] > key AND j ≥ 0', d:'Selama ada elemen lebih besar dari key di sebelah kiri...'},
-      {n:5, a:'GESER: arr[j+1] = arr[j], j−−', d:'Geser elemen ke kanan untuk membuat ruang bagi key.'},
-      {n:6, a:'SISIPKAN: arr[j+1] = key', d:'Tempatkan key di posisi yang tepat. i++, ulangi untuk elemen berikutnya.'},
+      {n:1, a:'MULAI dari i = 1', d:'Elemen pertama sudah terurut.'},
+      {n:2, a:'key = arr[i]', d:'Ambil elemen.'},
+      {n:3, a:'SET j', d:'Bandingkan dengan kiri.'},
+      {n:4, a:'WHILE', d:'Selama lebih besar, geser.'},
+      {n:5, a:'GESER', d:'Pindahkan ke kanan.'},
+      {n:6, a:'SISIPKAN', d:'Letakkan di posisi tepat.'},
     ],
+
     obs:[
-      {icon:'🃏', b:'Analogi kartu remi', p:'Bayangkan kamu menerima kartu satu per satu dan langsung menyortirnya di tangan. Itulah Insertion Sort! Coba lakukan secara manual dengan 5 kartu — rasakan bedanya dibanding Selection Sort.'},
-      {icon:'📦', b:'Shift vs Swap: mana lebih hemat?', p:'Insertion Sort menggunakan SHIFT (1 operasi tulis), bukan SWAP (butuh 3 operasi: temp, a=b, b=temp). Hitung total penghematan operasi memori untuk n=10 elemen pada kondisi worst-case.'},
+      {icon:'👀', b:'Pola penyisipan', p:'Apakah elemen berpindah jauh atau hanya sedikit pergeseran?'},
+      {icon:'📈', b:'Kondisi terbaik', p:'Apa yang terjadi jika data hampir terurut?'},
+      {icon:'🔄', b:'Shift vs Swap', p:'Kenapa menggunakan shift, bukan swap? Apa dampaknya?'},
     ],
+
     debat:[
-      {icon:'⚡', b:'Kenapa library modern pakai Insertion Sort?', p:'Python (Timsort), Java (DualPivot), dan V8 JavaScript Engine menggunakan Insertion Sort untuk sub-array berukuran kecil (biasanya n < 10–32). Cari tahu ambang batas pastinya dan jelaskan: mengapa Quicksort justru kalah untuk ukuran kecil?'},
-      {icon:'🔍', b:'Binary Insertion Sort: lebih cepat?', p:'Gunakan Binary Search untuk mencari posisi sisip — dari O(n) menjadi O(log n) perbandingan per elemen. Implementasikan dan ukur. Apakah time complexity secara keseluruhan berubah? Diskusikan perbedaan antara "comparison complexity" dan "movement complexity".'},
-      {icon:'📡', b:'Online algorithm: relevan di mana?', p:'Insertion Sort adalah "online algorithm" — bisa proses data real-time saat data baru masuk satu per satu. Debatkan 3 skenario: leaderboard game online, antrian rumah sakit darurat, feed media sosial berdasarkan waktu. Mana yang paling cocok dan mengapa?'},
+      {icon:'⚡', b:'Efisiensi nyata', p:'Kenapa sangat cepat untuk data kecil? Jelaskan dari jumlah operasi.'},
+      {icon:'🧠', b:'Optimasi', p:'Apakah Binary Search benar-benar mempercepat Insertion Sort?'},
+      {icon:'📊', b:'Penggunaan nyata', p:'Kenapa digunakan di library modern untuk data kecil?'},
     ]
   },
 
   quick:{
     name:'Quicksort',
-    desc:'Algoritma divide-and-conquer. Pilih satu "pivot", partisi array sehingga semua elemen lebih kecil dari pivot ada di kiri dan lebih besar ada di kanan. Ulangi secara rekursif.',
+    desc:'Menggunakan pivot untuk membagi data.',
     badge:'O(n log n)', bBg:'#fef3c7', bTxt:'#b45309',
     best:'O(n log n)', avg:'O(n log n)', worst:'O(n²)',
-    note:'⚠️ Worst-case O(n²) terjadi jika pivot selalu terpilih sebagai nilai terkecil/terbesar (array sudah terurut + pivot = last element).',
+    note:'Tergantung pemilihan pivot.',
+
     steps:[
-      {n:1, a:'PILIH PIVOT', d:'Tentukan elemen pivot berdasarkan strategi (last, first, atau middle).'},
-      {n:2, a:'PARTISI ARRAY', d:'Pindahkan semua elemen < pivot ke kiri, semua elemen > pivot ke kanan dari pivot.'},
-      {n:3, a:'TEMPATKAN PIVOT', d:'Pivot kini berada di posisi finalnya yang benar — tidak akan bergerak lagi.'},
-      {n:4, a:'REKURSI KIRI', d:'Terapkan Quicksort pada sub-array kiri (semua elemen < pivot).'},
-      {n:5, a:'REKURSI KANAN', d:'Terapkan Quicksort pada sub-array kanan (semua elemen > pivot).'},
-      {n:6, a:'BASE CASE → SELESAI', d:'Berhenti jika sub-array berukuran 0 atau 1 — sudah pasti terurut.'},
+      {n:1, a:'PILIH PIVOT', d:'Tentukan pivot.'},
+      {n:2, a:'PARTISI', d:'Pisahkan data.'},
+      {n:3, a:'TEMPATKAN', d:'Pivot ke posisi benar.'},
+      {n:4, a:'REKURSI', d:'Proses kiri.'},
+      {n:5, a:'REKURSI', d:'Proses kanan.'},
+      {n:6, a:'SELESAI', d:'Array terurut.'},
     ],
+
     obs:[
-      {icon:'📌', b:'Pivot selalu ke posisi final', p:'Amati elemen ungu (pivot). Setelah proses partisi, pivot LANGSUNG berada di posisi finalnya yang benar dan tidak bergerak lagi. Ini properti kunci Quicksort — berbeda dengan algoritma lain!'},
-      {icon:'🌳', b:'Pohon rekursi & keseimbangan', p:'Bandingkan strategi "Last" vs "Middle" pada data yang sama. Strategi mana yang menghasilkan lebih sedikit total langkah? Mengapa keseimbangan partisi sangat memengaruhi performa?'},
+      {icon:'👀', b:'Peran pivot', p:'Apakah pivot langsung berada di posisi final setelah partisi?'},
+      {icon:'⚖️', b:'Keseimbangan', p:'Apa yang terjadi jika pembagian tidak seimbang?'},
+      {icon:'🌳', b:'Rekursi', p:'Bagaimana bentuk struktur rekursinya?'},
     ],
+
     debat:[
-      {icon:'🎯', b:'Pivot acak vs deterministik: trade-off nyata', p:'Randomized Quicksort menggunakan pivot acak untuk menghindari worst-case. Tapi random number generation butuh waktu CPU. Untuk n=1.000.000 elemen, apakah overhead ini signifikan? Kapan Median-of-Three lebih baik dari random pivot?'},
-      {icon:'⚔️', b:'Quicksort vs Merge Sort: pilih satu untuk project', p:'Quicksort: rata-rata O(n log n), in-place, tapi worst-case O(n²). Merge Sort: O(n log n) guaranteed, tapi butuh O(n) memori extra. Jika kamu membangun fitur sort untuk aplikasi mobile dengan RAM terbatas, mana yang kamu pilih? Justifikasi dengan angka!'},
-      {icon:'🛡️', b:'Serangan DoS via algorithmic complexity', p:'Jika kamu tahu sistem menggunakan last-element pivot, kamu bisa kirim data terurut untuk memicu worst-case O(n²) dan membuat server lambat. Ini bukan teori — sudah terjadi di dunia nyata (CVE pada Perl, PHP, Java sebelum tahun 2012). Diskusikan cara mitigasinya!'},
+      {icon:'🎯', b:'Pemilihan pivot', p:'Seberapa besar pengaruh pivot terhadap performa?'},
+      {icon:'⚔️', b:'Perbandingan', p:'Quicksort vs Merge Sort: mana lebih baik untuk memori terbatas?'},
+      {icon:'🛡️', b:'Worst-case', p:'Bagaimana menghindari O(n²)? Apakah random pivot selalu solusi?'},
     ]
   }
 };
