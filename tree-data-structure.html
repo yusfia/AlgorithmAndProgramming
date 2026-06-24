@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tree Master: Game Interaktif Struktur Data Tree (DFS & BFS)</title>
+    <!-- Tailwind CSS for modern fluid UI layout -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Poppins & JetBrains Mono for a clean tech aesthetic -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Custom styling for smooth animations and cyber aesthetics -->
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #020c1b;
+            color: #ccd6f6;
+            overflow-x: hidden;
+        }
+        .code-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #020c1b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #112240;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64ffda;
+        }
+        /* Neon glowing effects */
+        .neon-glow {
+            box-shadow: 0 0 15px rgba(100, 255, 218, 0.25);
+        }
+        .neon-glow-error {
+            box-shadow: 0 0 15px rgba(244, 63, 94, 0.35);
+        }
+        .neon-text {
+            text-shadow: 0 0 8px rgba(100, 255, 218, 0.5);
+        }
+
+        /* Keyframe animations for sleek dynamic transitions */
+        @keyframes svgPop {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .svg-node-group {
+            transform-origin: center;
+            animation: svgPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @keyframes lineDraw {
+            from { stroke-dashoffset: 100; }
+            to { stroke-dashoffset: 0; }
+        }
+        .line-draw {
+            stroke-dasharray: 100;
+            stroke-dashoffset: 100;
+            animation: lineDraw 0.5s ease-out forwards;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { r: 24px; stroke-width: 2px; stroke-opacity: 0.6; }
+            50% { r: 32px; stroke-width: 4px; stroke-opacity: 1; }
+        }
+        .pulse-ring {
+            animation: pulseGlow 1.8s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+<!-- HEADER BAR -->
+<header class="border-b border-[#233554] bg-[#0a192f] px-6 py-4 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-gradient-to-tr from-[#64ffda] to-teal-500 flex items-center justify-center text-slate-900 font-extrabold text-xl neon-glow">
+                <i class="fa-solid fa-diagram-project"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-extrabold tracking-wider text-white flex items-center gap-2">
+                    TREE <span class="text-[#64ffda]">MASTER</span>
+                </h1>
+                <p class="text-xs text-[#8892b0]">Eksplorasi BFS, DFS &amp; Binary Search Tree</p>
+            </div>
+        </div>
+
+        <!-- Game Mode Switcher Buttons -->
+        <div class="flex bg-[#112240] rounded-full p-1 border border-[#233554] text-xs max-w-full overflow-x-auto">
+            <button onclick="switchMode('menu')" id="btn-menu" class="px-4 py-2 rounded-full font-semibold transition-all duration-300 bg-[#64ffda] text-slate-900 shadow shrink-0">
+                <i class="fa-solid fa-house mr-1"></i> Menu Utama
+            </button>
+            <button onclick="switchMode('bst')" id="btn-bst" class="px-4 py-2 rounded-full font-semibold text-[#8892b0] hover:text-white transition-all duration-300 shrink-0">
+                <i class="fa-solid fa-folder-plus mr-1"></i> Pembangun BST
+            </button>
+            <button onclick="switchMode('traversal')" id="btn-traversal" class="px-4 py-2 rounded-full font-semibold text-[#8892b0] hover:text-white transition-all duration-300 shrink-0">
+                <i class="fa-solid fa-route mr-1"></i> Penjelajah DFS/BFS
+            </button>
+            <button onclick="switchMode('sandbox')" id="btn-sandbox" class="px-4 py-2 rounded-full font-semibold text-[#8892b0] hover:text-white transition-all duration-300 shrink-0">
+                <i class="fa-solid fa-flask mr-1"></i> Sandbox Mode
+            </button>
+        </div>
+
+        <!-- Volume and Sound Control -->
+        <div class="flex items-center gap-3">
+            <button onclick="toggleAudio()" id="audio-toggle" class="w-10 h-10 rounded-full bg-[#112240] hover:bg-[#233554] border border-[#233554] text-white flex items-center justify-center transition-all">
+                <i class="fa-solid fa-volume-high text-[#64ffda]" id="audio-icon"></i>
+            </button>
+            <button onclick="showHelpModal()" class="px-4 py-2 rounded-lg bg-[#112240] hover:bg-[#233554] border border-[#233554] text-white font-semibold flex items-center gap-2 transition-all">
+                <i class="fa-regular fa-circle-question text-[#64ffda]"></i> Panduan DFS/BFS
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- MAIN CONTENT VIEWPORTS -->
+<main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6 flex flex-col justify-center">
+
+    <!-- ================= MODE: MENU UTAMA ================= -->
+    <div id="view-menu" class="grid grid-cols-1 md:grid-cols-3 gap-6 py-8">
+        <div class="md:col-span-3 text-center mb-6">
+            <h2 class="text-4xl md:text-5xl font-black text-white leading-tight">
+                Kuasai <span class="text-[#64ffda] neon-text">DFS &amp; BFS</span><br>Secara Visual &amp; Interaktif!
+            </h2>
+            <p class="text-base text-[#8892b0] mt-3 max-w-2xl mx-auto">
+                Pelajari bagaimana komputer menjelajahi struktur data Tree menggunakan pendekatan mendalam (DFS) maupun melebar (BFS) melalui simulasi interaktif yang menyenangkan.
+            </p>
+        </div>
+
+        <!-- Card: Pembangun BST -->
+        <div class="bg-[#0a192f] border border-[#233554] hover:border-[#64ffda] p-6 rounded-2xl flex flex-col justify-between transition-all duration-300 hover:shadow-xl group">
+            <div>
+                <div class="w-14 h-14 rounded-2xl bg-teal-950 flex items-center justify-center text-[#64ffda] text-3xl mb-6 border border-teal-800 group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-circle-nodes"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2 group-hover:text-[#64ffda] transition-colors">Pembangun BST</h3>
+                <p class="text-sm text-[#8892b0] leading-relaxed mb-6">
+                    Latih reflek aturan Binary Search Tree. Tentukan ke mana simpul angka baru harus berjalan dari simpul akar berdasarkan perbandingan nilai numeriknya.
+                </p>
+            </div>
+            <button onclick="switchMode('bst')" class="w-full py-3 rounded-xl bg-[#112240] hover:bg-[#64ffda] hover:text-slate-900 border border-[#233554] font-bold transition-all text-center flex items-center justify-center gap-2">
+                Mulai Bermain <i class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+        </div>
+
+        <!-- Card: Penjelajah Traversal (DFS/BFS) -->
+        <div class="bg-[#0a192f] border border-[#233554] hover:border-[#64ffda] p-6 rounded-2xl flex flex-col justify-between transition-all duration-300 hover:shadow-xl group">
+            <div>
+                <div class="w-14 h-14 rounded-2xl bg-teal-950 flex items-center justify-center text-[#64ffda] text-3xl mb-6 border border-teal-800 group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-route"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2 group-hover:text-[#64ffda] transition-colors">Penjelajah DFS &amp; BFS</h3>
+                <p class="text-sm text-[#8892b0] leading-relaxed mb-6">
+                    Uji pengetahuan Anda tentang penelusuran. Selesaikan tantangan urutan langkah kunjungan simpul berdasarkan metode <span class="text-teal-400">DFS (Pre-Order, In-Order, Post-Order)</span> dan <span class="text-teal-400">BFS (Level-Order)</span>.
+                </p>
+            </div>
+            <button onclick="switchMode('traversal')" class="w-full py-3 rounded-xl bg-[#112240] hover:bg-[#64ffda] hover:text-slate-900 border border-[#233554] font-bold transition-all text-center flex items-center justify-center gap-2">
+                Mulai Bermain <i class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+        </div>
+
+        <!-- Card: Sandbox Visualisasi -->
+        <div class="bg-[#0a192f] border border-[#233554] hover:border-[#64ffda] p-6 rounded-2xl flex flex-col justify-between transition-all duration-300 hover:shadow-xl group">
+            <div>
+                <div class="w-14 h-14 rounded-2xl bg-teal-950 flex items-center justify-center text-[#64ffda] text-3xl mb-6 border border-teal-800 group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-vials"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2 group-hover:text-[#64ffda] transition-colors">Sandbox Visualizer</h3>
+                <p class="text-sm text-[#8892b0] leading-relaxed mb-6">
+                    Buat kustomisasi pohon Anda sendiri secara bebas. Jalankan simulasi otomatis langkah-demi-langkah visual untuk melihat bagaimana DFS dan BFS merayapi cabang pohon.
+                </p>
+            </div>
+            <button onclick="switchMode('sandbox')" class="w-full py-3 rounded-xl bg-[#112240] hover:bg-[#64ffda] hover:text-slate-900 border border-[#233554] font-bold transition-all text-center flex items-center justify-center gap-2">
+                Coba Sekarang <i class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- ================= INTERACTIVE WORKSPACE ================= -->
+    <div id="view-gameplay" class="hidden grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+        <!-- LEFT PANEL: Status / Stats / Control Info -->
+        <div class="bg-[#0a192f] border border-[#233554] p-5 rounded-2xl flex flex-col justify-between h-full min-h-[250px] lg:col-span-1">
+            <div>
+                <!-- Mode Title badge -->
+                <div class="text-xs font-bold uppercase tracking-widest text-[#64ffda] border border-[#64ffda]/30 bg-[#64ffda]/10 px-3 py-1.5 rounded-full inline-block mb-4" id="game-badge">
+                    PEMBANGUN BST
+                </div>
+
+                <h3 id="game-title" class="text-xl font-black text-white leading-snug mb-3">Tantangan Penempatan</h3>
+                <p id="game-description" class="text-xs text-[#8892b0] mb-6">Tempatkan simpul baru di lokasi yang tepat sesuai aturan BST.</p>
+
+                <!-- Scoreboard & Heart indicators -->
+                <div class="space-y-3 mb-6">
+                    <!-- Score Indicator -->
+                    <div class="flex justify-between items-center bg-[#112240] p-3 rounded-xl border border-[#233554]">
+                        <span class="text-xs text-[#8892b0]"><i class="fa-solid fa-star text-amber-400 mr-1"></i> Skor</span>
+                        <span id="score-val" class="text-lg font-bold text-white code-font">000</span>
+                    </div>
+
+                    <!-- Lives / Health Indicator -->
+                    <div id="lives-container" class="flex justify-between items-center bg-[#112240] p-3 rounded-xl border border-[#233554]">
+                        <span class="text-xs text-[#8892b0]"><i class="fa-solid fa-heart text-rose-500 mr-1"></i> Nyawa</span>
+                        <div class="flex gap-1 text-rose-500" id="hearts-box">
+                            <i class="fa-solid fa-heart"></i>
+                            <i class="fa-solid fa-heart"></i>
+                            <i class="fa-solid fa-heart"></i>
+                        </div>
+                    </div>
+
+                    <!-- Level Indicator -->
+                    <div id="level-container" class="flex justify-between items-center bg-[#112240] p-3 rounded-xl border border-[#233554]">
+                        <span class="text-xs text-[#8892b0]"><i class="fa-solid fa-trophy text-yellow-400 mr-1"></i> Level</span>
+                        <span id="level-val" class="text-xs font-bold text-white">Level 1 (Sederhana)</span>
+                    </div>
+
+                    <!-- Special info/rules context container -->
+                    <div id="instructions-card" class="bg-[#112240]/40 border border-[#233554]/60 p-4 rounded-xl text-xs space-y-2">
+                        <h4 class="font-bold text-white text-xs uppercase tracking-wide flex items-center gap-1.5 text-[#64ffda]">
+                            <i class="fa-solid fa-lightbulb"></i> Aturan Navigasi:
+                        </h4>
+                        <p id="helper-rules-text" class="text-[#8892b0] leading-relaxed">
+                            Simpul saat ini disorot dengan cincin berkilau. Gunakan tombol aksi di bawah untuk menentukan rute simpul yang masuk!
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Control Buttons for Actions / Reset -->
+            <div class="space-y-2 mt-4 pt-4 border-t border-[#233554]">
+                <button id="btn-restart" onclick="restartCurrentGame()" class="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-[#112240] border border-[#233554] font-semibold text-xs transition-all text-white flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-arrow-rotate-left"></i> Mulai Ulang Tantangan
+                </button>
+                <button onclick="switchMode('menu')" class="w-full py-2.5 rounded-xl text-slate-400 hover:text-white font-semibold text-xs transition-all text-center">
+                    <i class="fa-solid fa-house mr-1"></i> Kembali ke Menu Utama
+                </button>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL: The Tree Visualizer Canvas Workspace (Center stage) -->
+        <div class="lg:col-span-3 flex flex-col gap-6">
+
+            <!-- THE INTERACTIVE CANVAS CONTAINER -->
+            <div class="bg-[#0a192f] border border-[#233554] rounded-2xl relative flex flex-col justify-between overflow-hidden min-h-[480px]" style="height: 520px;">
+
+                <!-- Background Grid Effect -->
+                <div class="absolute inset-0 opacity-5 pointer-events-none" style="background-image: radial-gradient(#64ffda 1px, transparent 1px); background-size: 20px 20px;"></div>
+
+                <!-- Overlay HUD: Interactive prompt/message bar -->
+                <div class="absolute top-4 left-4 right-4 z-10 flex flex-col sm:flex-row justify-between items-center gap-2 pointer-events-none">
+                    <!-- Left alert banner -->
+                    <div id="canvas-hud" class="bg-[#112240]/95 border border-[#233554] px-4 py-2 rounded-xl text-xs text-white font-medium flex items-center gap-2 shadow-lg backdrop-blur-sm pointer-events-auto max-w-full">
+                        <span class="w-2 h-2 rounded-full bg-[#64ffda] animate-ping shrink-0"></span>
+                        <span id="hud-message" class="truncate">Selamat Datang! Siap mempelajari DFS &amp; BFS?</span>
+                    </div>
+
+                    <!-- Floating next element logic (for BST Insert mode) -->
+                    <div id="next-node-display" class="bg-gradient-to-r from-teal-900 to-indigo-900 border border-teal-500/50 px-4 py-2.5 rounded-xl text-xs text-white font-bold flex items-center gap-3 shadow-lg pointer-events-auto neon-glow">
+                        <span>Simpul Masuk:</span>
+                        <span id="next-node-val" class="w-8 h-8 rounded-full bg-[#64ffda] text-slate-900 flex items-center justify-center font-extrabold text-sm transition-all duration-300">45</span>
+                    </div>
+                </div>
+
+                <!-- TREE GRAPHICS SCREEN -->
+                <div id="tree-canvas" class="relative flex-grow w-full h-full overflow-hidden flex items-center justify-center">
+                    <svg id="tree-svg" class="w-full h-full select-none" style="min-height: 380px;">
+                        <!-- Dynamic rendering of nodes and edges happens here exclusively -->
+                    </svg>
+
+                    <!-- Empty State View overlay -->
+                    <div id="empty-state-view" class="absolute inset-0 flex items-center justify-center text-center hidden pointer-events-none">
+                        <div class="bg-[#112240]/90 border border-[#233554] p-6 rounded-2xl max-w-xs pointer-events-auto shadow-xl backdrop-blur-sm">
+                            <i class="fa-solid fa-seedling text-teal-400 text-3xl mb-3 animate-bounce"></i>
+                            <h4 class="text-white font-bold text-sm mb-1">Pohon Masih Kosong</h4>
+                            <p class="text-[11px] text-[#8892b0]">Mulailah menginput nilai atau jalankan game untuk membesarkan pohon biner.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ACTION CONTROLLER FOOTER: Input buttons / Dynamic traversal buttons depending on Mode -->
+                <div id="action-hud" class="bg-[#112240] border-t border-[#233554] p-4 flex flex-col sm:flex-row justify-between items-center gap-4 z-20">
+                    <!-- Insertion and Visualizer controllers for Sandbox -->
+                    <div id="ctrl-sandbox" class="hidden w-full flex flex-col lg:flex-row justify-between items-center gap-3">
+                        <div class="flex items-center gap-2 w-full lg:w-auto">
+                            <input type="number" id="input-sandbox-val" placeholder="Angka (0-99)" class="bg-[#020c1b] border border-[#233554] focus:border-[#64ffda] rounded-xl px-4 py-2 text-sm text-white font-semibold w-full sm:w-32 outline-none code-font transition-all text-center">
+                            <button onclick="sandboxInsertNode()" class="px-4 py-2 bg-[#64ffda] text-slate-900 font-bold text-sm rounded-xl hover:bg-teal-400 transition-all flex items-center gap-1.5 shrink-0">
+                                <i class="fa-solid fa-plus"></i> Sisipkan
+                            </button>
+                            <button onclick="clearSandboxTree()" class="p-2.5 bg-rose-900/40 hover:bg-rose-950 border border-rose-500/40 text-rose-300 rounded-xl transition-all" title="Kosongkan Pohon">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                            <button onclick="generateRandomSandboxTree()" class="p-2.5 bg-indigo-900/40 hover:bg-indigo-950 border border-indigo-500/40 text-indigo-300 rounded-xl transition-all" title="Acak Pohon">
+                                <i class="fa-solid fa-shuffle"></i>
+                            </button>
+                        </div>
+                        <!-- Live Auto Traversal Simulator Buttons -->
+                        <div class="flex flex-wrap gap-2 w-full lg:w-auto justify-end border-t lg:border-t-0 pt-2 lg:pt-0 border-[#233554]">
+                            <span class="text-[10px] text-[#8892b0] font-semibold flex items-center mr-1">Simulasi Auto:</span>
+                            <button onclick="triggerSandboxSimulation('dfs-pre')" class="px-2.5 py-1.5 bg-[#112240] hover:bg-[#233554] border border-[#233554] hover:border-[#64ffda] text-[11px] text-[#64ffda] rounded-lg transition-all">DFS Pre-Order</button>
+                            <button onclick="triggerSandboxSimulation('dfs-in')" class="px-2.5 py-1.5 bg-[#112240] hover:bg-[#233554] border border-[#233554] hover:border-[#64ffda] text-[11px] text-[#64ffda] rounded-lg transition-all">DFS In-Order</button>
+                            <button onclick="triggerSandboxSimulation('dfs-post')" class="px-2.5 py-1.5 bg-[#112240] hover:bg-[#233554] border border-[#233554] hover:border-[#64ffda] text-[11px] text-[#64ffda] rounded-lg transition-all">DFS Post-Order</button>
+                            <button onclick="triggerSandboxSimulation('bfs')" class="px-2.5 py-1.5 bg-gradient-to-r from-teal-900 to-indigo-900 hover:from-teal-850 hover:to-indigo-850 border border-[#64ffda]/30 text-[11px] text-white font-bold rounded-lg transition-all shadow">BFS (Level-Order)</button>
+                        </div>
+                    </div>
+
+                    <!-- BST Game controls: Navigation through the tree (Kiri, Kanan, Selesai/Tempatkan) -->
+                    <div id="ctrl-bst" class="hidden w-full flex flex-col sm:flex-row justify-between items-center gap-4">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                            <span class="text-[10px] text-[#8892b0] font-semibold uppercase tracking-wider">Arahkan Navigasi:</span>
+                            <div class="text-xs font-bold text-white">
+                                Fokus Node: <span id="current-focused-node" class="text-[#64ffda] code-font bg-[#020c1b] border border-[#233554] px-2 py-0.5 rounded">None</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 w-full sm:w-auto">
+                            <button onclick="navigateBST('left')" id="btn-nav-left" class="flex-1 sm:flex-none px-4 py-2.5 bg-[#112240] hover:bg-slate-900 border border-[#233554] hover:border-[#64ffda] text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-arrow-left text-[#64ffda]"></i> Ke Kiri
+                            </button>
+                            <button onclick="placeBSTNode()" class="flex-1 sm:flex-none px-5 py-2.5 bg-[#64ffda] text-slate-900 font-black text-xs rounded-xl hover:bg-teal-400 transition-all flex items-center justify-center gap-1.5 shadow-lg">
+                                <i class="fa-solid fa-circle-check"></i> Tempatkan Di Sini
+                            </button>
+                            <button onclick="navigateBST('right')" id="btn-nav-right" class="flex-1 sm:flex-none px-4 py-2.5 bg-[#112240] hover:bg-slate-900 border border-[#233554] hover:border-[#64ffda] text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5">
+                                Ke Kanan <i class="fa-solid fa-arrow-right text-[#64ffda]"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Traversal mode status / active controls -->
+                    <div id="ctrl-traversal" class="hidden w-full flex flex-col sm:flex-row justify-between items-center gap-4">
+                        <div class="flex flex-col gap-1 w-full sm:w-auto">
+                            <span class="text-[10px] text-[#8892b0] font-semibold uppercase tracking-wider">Target Lintas Urutan:</span>
+                            <div id="traversal-rule-desc" class="text-xs font-bold text-[#64ffda] flex items-center gap-1">
+                                In-Order (Kiri → Root → Kanan)
+                            </div>
+                        </div>
+
+                        <!-- Tracking the player clicked steps visually in console style -->
+                        <div class="w-full sm:w-auto flex flex-col items-end gap-1">
+                            <span class="text-[10px] text-[#8892b0] font-semibold uppercase tracking-wider">Langkah Penelusuran Anda:</span>
+                            <div id="traversal-steps-box" class="code-font text-xs bg-[#020c1b] border border-[#233554] p-2 rounded-lg text-white w-full sm:w-64 overflow-x-auto whitespace-nowrap min-h-[34px] flex items-center">
+                                <span class="text-gray-500 italic text-[11px]">Mulai klik node...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- FOOTER PANEL -->
+<footer class="border-t border-[#233554] bg-[#0a192f] py-4 text-center text-[11px] text-[#8892b0]">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-2">
+        <p>&copy; 2026 Game Edukasi Struktur Data Tree. Didukung Visualisasi Dinamis DFS &amp; BFS.</p>
+        <div class="flex gap-4">
+            <a href="#" onclick="showHelpModal(); return false;" class="hover:text-[#64ffda] transition-all">Materi Belajar</a>
+            <span class="text-[#233554]">&bull;</span>
+            <a href="#" onclick="switchMode('sandbox'); return false;" class="hover:text-[#64ffda] transition-all">Simulasi Otomatis</a>
+        </div>
+    </div>
+</footer>
+
+<!-- OVERLAYS AND INTERACTIVE POPUP MODALS -->
+
+<!-- 1. POPUP GAME OVER / LEVEL COMPLETE MODAL -->
+<div id="game-status-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-[#0a192f] border-2 border-[#64ffda] p-8 rounded-3xl max-w-md w-full text-center relative neon-glow">
+        <!-- Modal Icon Glow -->
+        <div id="modal-status-icon-box" class="w-20 h-20 rounded-full mx-auto flex items-center justify-center text-4xl mb-6 shadow-lg">
+            <i class="fa-solid fa-trophy"></i>
+        </div>
+
+        <h2 id="modal-status-title" class="text-2xl font-extrabold text-white mb-2">Tantangan Berhasil!</h2>
+        <p id="modal-status-desc" class="text-xs text-[#8892b0] mb-6">Anda telah menyusun seluruh pohon biner dengan presisi sempurna.</p>
+
+        <!-- Quick Stat Box -->
+        <div class="bg-[#112240] p-4 rounded-xl border border-[#233554] mb-6 flex justify-around text-center">
+            <div>
+                <span class="text-[10px] text-[#8892b0] uppercase tracking-wider block">Skor Akhir</span>
+                <span id="modal-stat-score" class="text-xl font-black text-[#64ffda] code-font">250</span>
+            </div>
+            <div class="border-l border-[#233554] h-10 my-auto"></div>
+            <div>
+                <span class="text-[10px] text-[#8892b0] uppercase tracking-wider block">Level</span>
+                <span id="modal-stat-level" class="text-xl font-black text-white">Level 1</span>
+            </div>
+        </div>
+
+        <!-- Action buttons inside modal -->
+        <div class="space-y-3">
+            <button id="modal-btn-next" onclick="modalPrimaryAction()" class="w-full py-3 bg-[#64ffda] text-slate-900 font-extrabold text-sm rounded-xl hover:bg-teal-400 transition-all flex items-center justify-center gap-2">
+                Level Berikutnya <i class="fa-solid fa-chevron-right"></i>
+            </button>
+            <button onclick="closeStatusModal(); switchMode('menu');" class="w-full py-3 bg-[#112240] hover:bg-slate-900 border border-[#233554] text-white font-bold text-sm rounded-xl transition-all">
+                Kembali Ke Menu Utama
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 2. POPUP DETAILED INSTRUCTIONS & HELP MODAL -->
+<div id="help-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-[#0a192f] border border-[#233554] p-6 md:p-8 rounded-3xl max-w-2xl w-full text-left relative overflow-y-auto max-h-[90vh]">
+        <button onclick="closeHelpModal()" class="absolute top-4 right-4 text-[#8892b0] hover:text-white transition-all text-xl">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <h2 class="text-xl font-black text-white mb-6 flex items-center gap-2 border-b border-[#233554] pb-3">
+            <span class="text-[#64ffda]"><i class="fa-solid fa-graduation-cap"></i></span> Panduan Struktur Data Tree: DFS vs BFS
+        </h2>
+
+        <!-- Quick manual categories -->
+        <div class="space-y-6 text-xs text-[#8892b0] leading-relaxed">
+            <!-- BFS & DFS Theory -->
+            <div class="bg-[#112240] p-4 rounded-xl border border-[#233554]">
+                <h3 class="font-bold text-white mb-3 text-sm flex items-center gap-2 text-[#64ffda]">
+                    <i class="fa-solid fa-route"></i> DFS (Depth-First Search) vs BFS (Breadth-First Search)
+                </h3>
+                <p class="mb-3">
+                    Bagaimana sebuah komputer menjelajahi cabang-cabang pohon? Ada dua metodologi pencarian dasar:
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-[11px]">
+                    <div class="bg-teal-950/40 p-3 rounded-lg border border-teal-500/20">
+                        <strong class="text-teal-400 block mb-1">🌲 DFS (Depth-First Search)</strong>
+                        Pencarian mendalam. Sistem akan menyelami cabang pohon kiri sedalam mungkin (sampai menyentuh Leaf), lalu mundur (*backtrack*) dan merambati cabang sebelah kanan.
+                        <span class="block mt-2 text-white font-semibold">Tipe DFS: Pre-Order, In-Order, Post-Order.</span>
+                    </div>
+                    <div class="bg-indigo-950/40 p-3 rounded-lg border border-indigo-500/20">
+                        <strong class="text-indigo-400 block mb-1">🌊 BFS (Breadth-First Search)</strong>
+                        Pencarian melebar. Sistem akan mengunjungi simpul tingkat demi tingkat secara seimbang (*Level-Order*), mulai dari Root (Level 0), lalu beralih ke Level 1, Level 2 dari kiri ke kanan.
+                        <span class="block mt-2 text-white font-semibold">Sangat cocok untuk mencari jalur terpendek (shortest path).</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game Mode manuals -->
+            <div>
+                <h3 class="font-bold text-white mb-2 text-sm flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#64ffda]"></span> Cara Bermain Game
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-[#112240]/40 border border-[#233554]/60 p-3 rounded-xl">
+                        <h4 class="font-semibold text-white mb-1 text-[11px] text-[#64ffda]">🕹️ Pembangun BST:</h4>
+                        <p class="text-[11px]">
+                            Anda diberi angka acak. Navigasikan dari <strong class="text-white">Root</strong>, tentukan rute ke kiri atau kanan hingga menemukan sel kosong berkilau yang pas, lalu klik <strong class="text-white">"Tempatkan Di Sini"</strong>. Jika salah, nyawa Anda akan berkurang!
+                        </p>
+                    </div>
+                    <div class="bg-[#112240]/40 border border-[#233554]/60 p-3 rounded-xl">
+                        <h4 class="font-semibold text-white mb-1 text-[11px] text-[#64ffda]">🚶 Penjelajah DFS/BFS:</h4>
+                        <p class="text-[11px]">
+                            Kunjungi setiap simpul dengan urutan spesifik. Klik langsung pada simpul di canvas yang seharusnya dikunjungi berikutnya berdasarkan algoritma traversal (Pre-Order, In-Order, Post-Order, atau Level-Order/BFS) yang diinstruksikan.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Traversal Rules explanations -->
+            <div>
+                <h3 class="font-bold text-white mb-2 text-sm flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#64ffda]"></span> Memahami 4 Algoritma Traversal (Penelusuran)
+                </h3>
+                <div class="space-y-3 bg-[#112240] p-4 rounded-xl border border-[#233554] text-[11px]">
+                    <div class="border-b border-[#233554]/40 pb-2">
+                        <strong class="text-white">1. Pre-Order DFS (Root &rarr; Kiri &rarr; Kanan):</strong>
+                        <p class="text-gray-400 mt-1">Cetak data di simpul saat ini, telusuri cabang anak kiri secara rekursif, kemudian telusuri cabang anak kanan.</p>
+                    </div>
+                    <div class="border-b border-[#233554]/40 pb-2">
+                        <strong class="text-white">2. In-Order DFS (Kiri &rarr; Root &rarr; Kanan):</strong>
+                        <p class="text-gray-400 mt-1">Telusuri cabang kiri dahulu, cetak simpul saat ini, baru telusuri cabang kanan. (Hasil cetak pada BST dipastikan terurut menaik!).</p>
+                    </div>
+                    <div class="border-b border-[#233554]/40 pb-2">
+                        <strong class="text-white">3. Post-Order DFS (Kiri &rarr; Kanan &rarr; Root):</strong>
+                        <p class="text-gray-400 mt-1">Telusuri seluruh cabang kiri, telusuri cabang kanan, baru cetak data di simpul akar/induk paling akhir.</p>
+                    </div>
+                    <div>
+                        <strong class="text-teal-400">4. Level-Order BFS (Lapis demi Lapis dari Atas ke Bawah):</strong>
+                        <p class="text-gray-400 mt-1">Selesai mengunjungi satu level, baru turun ke level berikutnya. Dari kiri ke kanan seimbang sempurna.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button onclick="closeHelpModal()" class="w-full mt-6 py-3 bg-[#64ffda] text-slate-900 font-extrabold text-sm rounded-xl hover:bg-teal-400 transition-all text-center">
+            Saya Mengerti &amp; Siap Bermain!
+        </button>
+    </div>
+</div>
+
+<!-- JAVASCRIPT GAME MOTOR LOGIC & RENDER ENGINE -->
+<script>
+    /* -----------------------------------------------------------
+     * WEB AUDIO SYNTHESIZER: Dynamic Audio generator (Zero Assets)
+     * ----------------------------------------------------------- */
+    let audioEnabled = true;
+    let audioCtx = null;
+
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    }
+
+    function playSynthSound(freqs, duration, type = 'sine', sweepFreq = null) {
+        if (!audioEnabled) return;
+        initAudio();
+        try {
+            const now = audioCtx.currentTime;
+
+            freqs.forEach((freq, idx) => {
+                const osc = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, now + (idx * duration));
+
+                if (sweepFreq) {
+                    osc.frequency.exponentialRampToValueAtTime(sweepFreq, now + (idx * duration) + duration);
+                }
+
+                gainNode.gain.setValueAtTime(0.12, now + (idx * duration));
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + (idx * duration) + duration);
+
+                osc.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+
+                osc.start(now + (idx * duration));
+                osc.stop(now + (idx * duration) + duration);
+            });
+        } catch (e) {
+            console.warn("Audio Context error: ", e);
+        }
+    }
+
+    const sounds = {
+        click: () => playSynthSound([600], 0.05, 'triangle'),
+        success: () => playSynthSound([523.25, 659.25, 783.99], 0.08, 'sine'),
+        error: () => playSynthSound([220, 147], 0.15, 'sawtooth'),
+        victory: () => playSynthSound([523.25, 659.25, 783.99, 1046.50], 0.12, 'sine'),
+        levelUp: () => playSynthSound([392, 523, 659, 783.99, 987.77, 1046.50], 0.1, 'sine')
+    };
+
+    function toggleAudio() {
+        audioEnabled = !audioEnabled;
+        const audioIcon = document.getElementById('audio-icon');
+        if (audioEnabled) {
+            audioIcon.className = "fa-solid fa-volume-high text-[#64ffda]";
+            sounds.click();
+        } else {
+            audioIcon.className = "fa-solid fa-volume-xmark text-slate-500";
+        }
+    }
+
+    /* -----------------------------------------------------------
+     * STATE VARIABLES AND GAME TREE CLASS
+     * ----------------------------------------------------------- */
+    class TreeNode {
+        constructor(val) {
+            this.val = val;
+            this.left = null;
+            this.right = null;
+            // Relative positioning inside calculated space
+            this.x = 0;
+            this.y = 0;
+        }
+    }
+
+    let currentMode = 'menu';
+    let currentTree = null;
+    let gameState = {
+        score: 0,
+        lives: 3,
+        level: 1,
+        targetTreeValues: [],
+        currentInsertVal: null,
+        focusedNode: null,
+        traversalType: 'inorder',
+        traversalExpectedSequence: [],
+        traversalIndex: 0,
+        traversalPlayerClicks: []
+    };
+
+    // Variable to handle active simulation highlights
+    let sandboxSimulatingNodes = [];
+    let sandboxSimulatingIndex = -1;
+
+    /* -----------------------------------------------------------
+     * UNIFIED SVG TREE GRAPHICS RENDER ENGINE
+     * ----------------------------------------------------------- */
+
+    // Find maximum depth of tree to space out levels nicely
+    function getMaxDepth(node) {
+        if (!node) return 0;
+        return 1 + Math.max(getMaxDepth(node.left), getMaxDepth(node.right));
+    }
+
+    // Calculate positions dynamically based on SVG bounding box
+    function calculateNodePositions(node, width, height) {
+        const maxD = getMaxDepth(currentTree) || 1;
+        // Balance vertical spacing across canvas height securely
+        const ySpacing = Math.min(85, (height - 120) / maxD);
+
+        function traverse(curr, depth, leftBoundary, rightBoundary) {
+            if (!curr) return;
+            // Midpoint defines precise dynamic X alignment
+            curr.x = leftBoundary + (rightBoundary - leftBoundary) / 2;
+            curr.y = 65 + depth * ySpacing;
+
+            traverse(curr.left, depth + 1, leftBoundary, curr.x);
+            traverse(curr.right, depth + 1, curr.x, rightBoundary);
+        }
+
+        // Outer horizontal paddings (40px)
+        traverse(currentTree, 0, 40, width - 40);
+    }
+
+    function showEmptyState(show) {
+        const emptyView = document.getElementById('empty-state-view');
+        if (show) {
+            emptyView.classList.remove('hidden');
+        } else {
+            emptyView.classList.add('hidden');
+        }
+    }
+
+    // Main Drawing engine to render entire Tree in clean SVG
+    function drawTree() {
+        const svg = document.getElementById('tree-svg');
+        svg.innerHTML = ''; // Fresh clean render
+
+        if (!currentTree) {
+            showEmptyState(true);
+            return;
+        }
+        showEmptyState(false);
+
+        // Fetch actual client workspace size for accurate absolute math scaling
+        const rect = svg.getBoundingClientRect();
+        const width = rect.width || 800;
+        const height = rect.height || 500;
+
+        // Compute alignment
+        calculateNodePositions(currentTree, width, height);
+
+        // Queue traversal to render structural lines behind nodes first
+        const queue = [currentTree];
+        const nodesList = [];
+
+        while (queue.length > 0) {
+            const node = queue.shift();
+            nodesList.push(node);
+
+            if (node.left) {
+                renderSVGEdge(node.x, node.y, node.left.x, node.left.y, svg);
+                queue.push(node.left);
+            }
+            if (node.right) {
+                renderSVGEdge(node.x, node.y, node.right.x, node.right.y, svg);
+                queue.push(node.right);
+            }
+        }
+
+        // Render Node groups above the connection lines
+        nodesList.forEach(node => {
+            renderSVGNode(node, svg);
+        });
+    }
+
+    // Create SVG Line elements with neon animation class
+    function renderSVGEdge(x1, y1, x2, y2, container) {
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', x1);
+        line.setAttribute('y1', y1);
+        line.setAttribute('x2', x2);
+        line.setAttribute('y2', y2);
+        line.setAttribute('stroke', '#233554');
+        line.setAttribute('stroke-width', '3');
+        line.setAttribute('class', 'line-draw');
+        container.appendChild(line);
+    }
+
+    // Create unified SVG node circle & text elements
+    function renderSVGNode(node, container) {
+        const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        group.setAttribute('class', 'svg-node-group cursor-pointer');
+        group.setAttribute('transform-origin', `${node.x} ${node.y}`);
+
+        // 1. Core variables deciding styling colors
+        let circleColor = '#112240';
+        let strokeColor = '#233554';
+        let textColor = '#ccd6f6';
+        let isFocused = false;
+        let isTraversalClicked = false;
+        let isSimulatingActive = false;
+
+        // Check if node is active in Sandbox Simulation mode
+        if (sandboxSimulatingNodes.length > 0 && sandboxSimulatingIndex >= 0) {
+            const currentSimulatingVal = sandboxSimulatingNodes[sandboxSimulatingIndex];
+            if (node.val === currentSimulatingVal) {
+                isSimulatingActive = true;
+                circleColor = '#1d4ed8'; // Indigo active
+                strokeColor = '#64ffda';
+                textColor = '#ffffff';
+            } else if (sandboxSimulatingNodes.slice(0, sandboxSimulatingIndex).includes(node.val)) {
+                // Already traversed in simulation
+                circleColor = '#065f46'; // Emerald visited
+                strokeColor = '#34d399';
+                textColor = '#ffffff';
+            }
+        }
+
+        if (!isSimulatingActive && sandboxSimulatingNodes.length === 0) {
+            if (currentMode === 'bst') {
+                if (gameState.focusedNode && gameState.focusedNode.val === node.val) {
+                    isFocused = true;
+                    circleColor = '#0f373c';
+                    strokeColor = '#64ffda';
+                    textColor = '#ffffff';
+                } else {
+                    strokeColor = '#1e3a5f';
+                    textColor = '#64ffda';
+                }
+            } else if (currentMode === 'traversal') {
+                isTraversalClicked = gameState.traversalPlayerClicks.includes(node.val);
+                if (isTraversalClicked) {
+                    circleColor = '#0f373c';
+                    strokeColor = '#64ffda';
+                    textColor = '#64ffda';
+                } else {
+                    strokeColor = '#3b82f6';
+                    textColor = '#ffffff';
+                }
+
+                // Click interaction handler inside SVG
+                group.onclick = () => onNodeClickTraversal(node.val);
+            } else {
+                // Sandbox Mode styling
+                strokeColor = '#64ffda';
+                textColor = '#ffffff';
+            }
+        }
+
+        // 2. Focused active pulse ring (Render behind actual node circle)
+        if (isFocused || isSimulatingActive) {
+            const pulseRing = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            pulseRing.setAttribute('cx', node.x);
+            pulseRing.setAttribute('cy', node.y);
+            pulseRing.setAttribute('class', 'pulse-ring');
+            pulseRing.setAttribute('fill', 'none');
+            pulseRing.setAttribute('stroke', '#64ffda');
+            container.appendChild(pulseRing);
+        }
+
+        // 3. Main Node Circle representation
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', node.x);
+        circle.setAttribute('cy', node.y);
+        circle.setAttribute('r', '22');
+        circle.setAttribute('fill', circleColor);
+        circle.setAttribute('stroke', strokeColor);
+        circle.setAttribute('stroke-width', '2.5');
+        circle.setAttribute('style', 'transition: all 0.3s ease;');
+        group.appendChild(circle);
+
+        // 4. Value text element exactly in center alignment
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', node.x);
+        text.setAttribute('y', node.y + 5); // perfect baseline vertical alignment shift
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('fill', textColor);
+        text.setAttribute('font-size', '14');
+        text.setAttribute('font-weight', 'bold');
+        text.setAttribute('class', 'code-font');
+        text.textContent = node.val;
+        group.appendChild(text);
+
+        container.appendChild(group);
+    }
+
+    // Canvas self-healing alignment update on window resize
+    window.addEventListener('resize', () => {
+        if (currentTree) {
+            drawTree();
+        }
+    });
+
+    /* -----------------------------------------------------------
+     * APP CONTROLLER: Switching Game modes
+     * ----------------------------------------------------------- */
+    function switchMode(mode) {
+        sounds.click();
+        currentMode = mode;
+
+        // Clear simulations on switch
+        sandboxSimulatingNodes = [];
+        sandboxSimulatingIndex = -1;
+
+        document.getElementById('view-menu').classList.add('hidden');
+        document.getElementById('view-gameplay').classList.add('hidden');
+
+        const switchBtns = ['btn-menu', 'btn-bst', 'btn-traversal', 'btn-sandbox'];
+        switchBtns.forEach(btn => {
+            const domBtn = document.getElementById(btn);
+            domBtn.className = "px-4 py-2 rounded-full font-semibold text-[#8892b0] hover:text-white transition-all duration-300 shrink-0";
+        });
+
+        if (mode === 'menu') {
+            document.getElementById('view-menu').classList.remove('hidden');
+            document.getElementById('btn-menu').className = "px-4 py-2 rounded-full font-semibold transition-all duration-300 bg-[#64ffda] text-slate-900 shadow shrink-0";
+            currentTree = null;
+        } else {
+            document.getElementById('view-gameplay').classList.remove('hidden');
+            document.getElementById(`btn-${mode}`).className = "px-4 py-2 rounded-full font-semibold transition-all duration-300 bg-[#64ffda] text-slate-900 shadow shrink-0";
+            setupGameForMode(mode);
+        }
+    }
+
+    function setupGameForMode(mode) {
+        document.getElementById('ctrl-sandbox').classList.add('hidden');
+        document.getElementById('ctrl-bst').classList.add('hidden');
+        document.getElementById('ctrl-traversal').classList.add('hidden');
+        document.getElementById('next-node-display').classList.add('hidden');
+        document.getElementById('lives-container').classList.add('hidden');
+        document.getElementById('level-container').classList.add('hidden');
+
+        if (mode === 'sandbox') {
+            currentTree = null;
+            document.getElementById('ctrl-sandbox').classList.remove('hidden');
+            document.getElementById('game-badge').innerText = "Sandbox Visualizer";
+            document.getElementById('game-title').innerText = "Papan Pasir Interaktif";
+            document.getElementById('game-description').innerText = "Masukkan angka bebas untuk divisualisasikan langsung secara real-time.";
+            document.getElementById('score-val').innerText = "---";
+            document.getElementById('helper-rules-text').innerText = "Coba klik tombol 'Simulasi Auto DFS/BFS' di bawah setelah menyusun pohon Anda. Sistem akan mendemonstrasikan perbandingan cara merayap DFS vs BFS secara visual!";
+            updateHUDMessage("Pohon dikosongkan. Masukkan angka pertama sebagai simpul Root!");
+            drawTree();
+        }
+        else if (mode === 'bst') {
+            document.getElementById('ctrl-bst').classList.remove('hidden');
+            document.getElementById('next-node-display').classList.remove('hidden');
+            document.getElementById('lives-container').classList.remove('hidden');
+            document.getElementById('level-container').classList.remove('hidden');
+            document.getElementById('game-badge').innerText = "Pembangun BST";
+
+            gameState.score = 0;
+            gameState.lives = 3;
+            gameState.level = 1;
+            initBSTGameLevel();
+        }
+        else if (mode === 'traversal') {
+            document.getElementById('ctrl-traversal').classList.remove('hidden');
+            document.getElementById('lives-container').classList.remove('hidden');
+            document.getElementById('level-container').classList.remove('hidden');
+            document.getElementById('game-badge').innerText = "Penjelajah Traversal";
+
+            gameState.score = 0;
+            gameState.lives = 3;
+            gameState.level = 1;
+            initTraversalGameLevel();
+        }
+    }
+
+    /* -----------------------------------------------------------
+     * MODE LOGIC: BST GAME BUILDER
+     * ----------------------------------------------------------- */
+    const bstLevels = {
+        1: {
+            title: "Level 1: Dasar Sederhana",
+            description: "Susun pohon kecil berisi 4 elemen. Sangat bagus untuk memanaskan logika navigasi dasar.",
+            values: [40, 20, 60, 10],
+            hint: "Ingat: Kiri untuk yang lebih kecil, Kanan untuk yang lebih besar."
+        },
+        2: {
+            title: "Level 2: Skala Menengah",
+            description: "Pohon biner tumbuh lebih tinggi dengan 6 elemen. Hati-hati menentukan jalur penurunan!",
+            values: [50, 30, 70, 20, 45, 80],
+            hint: "Pastikan Anda melihat nomor input secara teliti dan bandingkan dengan node fokus (bercincin)."
+        },
+        3: {
+            title: "Level 3: Master Seimbang",
+            description: "Susun struktur pohon bercabang rimbun dengan total 8 elemen. Tunjukkan keahlian Anda!",
+            values: [60, 35, 80, 20, 45, 70, 90, 15],
+            hint: "Fokus! Jika tersesat, kembalilah mengecek dari simpul Root (Akar) paling atas."
+        }
+    };
+
+    function initBSTGameLevel() {
+        const levelData = bstLevels[gameState.level];
+        document.getElementById('level-val').innerText = `Level ${gameState.level}`;
+        document.getElementById('game-title').innerText = levelData.title;
+        document.getElementById('game-description').innerText = levelData.description;
+        document.getElementById('helper-rules-text').innerText = levelData.hint;
+        document.getElementById('score-val').innerText = padZero(gameState.score);
+        updateHeartsUI();
+
+        currentTree = null;
+        gameState.targetTreeValues = [...levelData.values];
+        gameState.currentInsertVal = gameState.targetTreeValues.shift();
+        gameState.focusedNode = null;
+
+        prepareNextBSTInsert();
+    }
+
+    function prepareNextBSTInsert() {
+        document.getElementById('next-node-val').innerText = gameState.currentInsertVal;
+
+        if (!currentTree) {
+            document.getElementById('current-focused-node').innerText = "None (Pohon Kosong)";
+            updateHUDMessage(`Sangat mudah! Tempatkan nilai pertama (${gameState.currentInsertVal}) sebagai simpul Root (Akar) Pohon.`);
+        } else {
+            gameState.focusedNode = currentTree;
+            document.getElementById('current-focused-node').innerText = currentTree.val;
+            updateHUDMessage(`Arahkan navigasi ke kiri/kanan dari Root untuk mencari tempat biner yang sah bagi angka ${gameState.currentInsertVal}!`);
+        }
+        drawTree();
+    }
+
+    function navigateBST(direction) {
+        sounds.click();
+        if (!currentTree) {
+            updateHUDMessage("Pohon kosong! Anda tidak bisa bernavigasi sebelum menempatkan Simpul Root!");
+            return;
+        }
+        if (!gameState.focusedNode) return;
+
+        if (direction === 'left') {
+            if (gameState.focusedNode.left) {
+                gameState.focusedNode = gameState.focusedNode.left;
+                document.getElementById('current-focused-node').innerText = gameState.focusedNode.val;
+                updateHUDMessage(`Turun ke cabang KIRI. Simpul fokus: ${gameState.focusedNode.val}.`);
+            } else {
+                updateHUDMessage(`Tidak ada anak kiri di bawah node ${gameState.focusedNode.val}. Ini adalah lokasi kosong potensial!`);
+            }
+        } else if (direction === 'right') {
+            if (gameState.focusedNode.right) {
+                gameState.focusedNode = gameState.focusedNode.right;
+                document.getElementById('current-focused-node').innerText = gameState.focusedNode.val;
+                updateHUDMessage(`Turun ke cabang KANAN. Simpul fokus: ${gameState.focusedNode.val}.`);
+            } else {
+                updateHUDMessage(`Tidak ada anak kanan di bawah node ${gameState.focusedNode.val}. Ini adalah lokasi kosong potensial!`);
+            }
+        }
+        drawTree();
+    }
+
+    function placeBSTNode() {
+        const incomingVal = gameState.currentInsertVal;
+
+        if (!currentTree) {
+            currentTree = new TreeNode(incomingVal);
+            sounds.success();
+            gameState.score += 20;
+            document.getElementById('score-val').innerText = padZero(gameState.score);
+            updateHUDMessage(`Bagus! Simpul Root bernilai ${incomingVal} berhasil ditanam.`);
+            advanceBSTInsertionProgress();
+            return;
+        }
+
+        let pathNode = currentTree;
+        let targetParent = null;
+        let expectedDirection = '';
+
+        while (pathNode) {
+            targetParent = pathNode;
+            if (incomingVal < pathNode.val) {
+                pathNode = pathNode.left;
+                expectedDirection = 'left';
+            } else {
+                pathNode = pathNode.right;
+                expectedDirection = 'right';
+            }
+        }
+
+        if (gameState.focusedNode.val === targetParent.val) {
+            const newNode = new TreeNode(incomingVal);
+            if (expectedDirection === 'left') {
+                targetParent.left = newNode;
+            } else {
+                targetParent.right = newNode;
+            }
+
+            sounds.success();
+            gameState.score += 30;
+            document.getElementById('score-val').innerText = padZero(gameState.score);
+            updateHUDMessage(`Jawaban Tepat! Angka ${incomingVal} diletakkan di sebelah ${expectedDirection.toUpperCase()} dari node ${targetParent.val}.`);
+            advanceBSTInsertionProgress();
+        } else {
+            sounds.error();
+            gameState.lives--;
+            updateHeartsUI();
+
+            updateHUDMessage(`Oops salah posisi! Sesuai aturan BST, angka ${incomingVal} seharusnya ditaruh di sebelah ${expectedDirection.toUpperCase()} dari simpul ${targetParent.val}!`);
+
+            if (gameState.lives <= 0) {
+                triggerGameOver();
+            }
+        }
+    }
+
+    function advanceBSTInsertionProgress() {
+        if (gameState.targetTreeValues.length > 0) {
+            gameState.currentInsertVal = gameState.targetTreeValues.shift();
+            setTimeout(prepareNextBSTInsert, 1400);
+        } else {
+            setTimeout(() => {
+                sounds.victory();
+                showStatusModal(true, "Level Selesai!", `Luar biasa! Anda telah sukses mengonstruksi pohon Binary Search Tree (BST) Level ${gameState.level} dengan gemilang.`);
+            }, 800);
+        }
+    }
+
+    /* -----------------------------------------------------------
+     * MODE LOGIC: TRAVERSAL CHALLENGE (With BFS & DFS Levels)
+     * ----------------------------------------------------------- */
+    const traversalLevels = {
+        1: {
+            title: "Level 1: Langkah DFS Pre-Order",
+            type: "preorder",
+            treeValues: [50, 30, 70, 20, 40],
+            expected: [50, 30, 20, 40, 70],
+            desc: "DFS Pre-Order: Kunjungi simpul dalam urutan ROOT → KIRI → KANAN.",
+            ruleText: "DFS Pre-Order: 1) Kunjungi Root, 2) Kiri secara rekursif, 3) Kanan secara rekursif."
+        },
+        2: {
+            title: "Level 2: Langkah DFS In-Order",
+            type: "inorder",
+            treeValues: [50, 25, 75, 10, 35, 60, 90],
+            expected: [10, 25, 35, 50, 60, 75, 90],
+            desc: "DFS In-Order: Kunjungi simpul dalam urutan KIRI → ROOT → KANAN.",
+            ruleText: "DFS In-Order: 1) Habiskan cabang kiri, 2) Cetak Root tengah, 3) Jelajahi cabang kanan."
+        },
+        3: {
+            title: "Level 3: Langkah DFS Post-Order",
+            type: "postorder",
+            treeValues: [50, 30, 70, 15, 45, 60, 85],
+            expected: [15, 45, 30, 60, 85, 70, 50],
+            desc: "DFS Post-Order: Kunjungi simpul dalam urutan KIRI → KANAN → ROOT.",
+            ruleText: "DFS Post-Order: 1) Telusuri kiri, 2) Telusuri kanan, 3) Cetak Root induk paling akhir."
+        },
+        4: {
+            title: "Level 4: Tantangan BFS (Level-Order)",
+            type: "bfs",
+            treeValues: [60, 40, 80, 20, 50, 70, 90],
+            expected: [60, 40, 80, 20, 50, 70, 90],
+            desc: "BFS (Level-Order): Jelajahi pohon melebar lapis demi lapis dari atas ke bawah, kiri ke kanan.",
+            ruleText: "BFS / Level-Order: Kunjungi semua simpul di tingkat kedalaman saat ini sebelum turun ke level berikutnya."
+        }
+    };
+
+    function initTraversalGameLevel() {
+        const tLevel = traversalLevels[gameState.level];
+        document.getElementById('level-val').innerText = `Level ${gameState.level}`;
+        document.getElementById('game-title').innerText = tLevel.title;
+        document.getElementById('game-description').innerText = tLevel.desc;
+        document.getElementById('traversal-rule-desc').innerHTML = tLevel.ruleText;
+        document.getElementById('score-val').innerText = padZero(gameState.score);
+        updateHeartsUI();
+
+        currentTree = null;
+        tLevel.treeValues.forEach(val => {
+            currentTree = insertBSTValue(currentTree, val);
+        });
+
+        gameState.traversalType = tLevel.type;
+        gameState.traversalExpectedSequence = [...tLevel.expected];
+        gameState.traversalIndex = 0;
+        gameState.traversalPlayerClicks = [];
+
+        document.getElementById('traversal-steps-box').innerHTML = `<span class="text-gray-500 italic text-[11px]">Mulai klik simpul di atas...</span>`;
+        updateHUDMessage(`Sebutkan jalur traversal pertama untuk urutan ${gameState.traversalType.toUpperCase()}!`);
+        drawTree();
+    }
+
+    function onNodeClickTraversal(val) {
+        const expectedNext = gameState.traversalExpectedSequence[gameState.traversalIndex];
+
+        if (gameState.traversalPlayerClicks.includes(val)) {
+            updateHUDMessage(`Simpul ${val} sudah berhasil diselesaikan! Cari simpul selanjutnya.`);
+            return;
+        }
+
+        if (val === expectedNext) {
+            sounds.success();
+            gameState.traversalPlayerClicks.push(val);
+            gameState.traversalIndex++;
+            gameState.score += 25;
+            document.getElementById('score-val').innerText = padZero(gameState.score);
+
+            updateHUDMessage(`Hebat! ${val} adalah node yang benar.`);
+            updateTraversalLogUI();
+            drawTree();
+
+            if (gameState.traversalIndex === gameState.traversalExpectedSequence.length) {
+                setTimeout(() => {
+                    sounds.victory();
+                    showStatusModal(true, "Misi Traversal Sukses!", `Selamat! Anda berhasil menaklukkan penelusuran ${gameState.traversalType.toUpperCase()} pada Level ${gameState.level}.`);
+                }, 600);
+            }
+        } else {
+            sounds.error();
+            gameState.lives--;
+            updateHeartsUI();
+            updateHUDMessage(`Ups, salah urut! Berdasarkan algoritma ${gameState.traversalType.toUpperCase()}, simpul berikutnya yang dikunjungi harusnya bernilai ${expectedNext}!`);
+
+            if (gameState.lives <= 0) {
+                triggerGameOver();
+            }
+        }
+    }
+
+    function updateTraversalLogUI() {
+        const box = document.getElementById('traversal-steps-box');
+        box.innerHTML = '';
+
+        gameState.traversalPlayerClicks.forEach((val, idx) => {
+            const stepSpan = document.createElement('span');
+            stepSpan.className = "inline-block bg-teal-900 text-[#64ffda] border border-[#64ffda]/30 px-2 py-0.5 rounded mr-1.5 font-bold text-xs";
+            stepSpan.innerText = val;
+            box.appendChild(stepSpan);
+
+            if (idx < gameState.traversalPlayerClicks.length - 1) {
+                const arrowSpan = document.createElement('span');
+                arrowSpan.className = "text-gray-500 mr-1.5 text-xs";
+                arrowSpan.innerHTML = "&rarr;";
+                box.appendChild(arrowSpan);
+            }
+        });
+    }
+
+    /* -----------------------------------------------------------
+     * MODE LOGIC: SANDBOX MODE VISUALIZER (DFS & BFS Simulations)
+     * ----------------------------------------------------------- */
+    function sandboxInsertNode() {
+        const inputValDom = document.getElementById('input-sandbox-val');
+        const val = parseInt(inputValDom.value);
+
+        if (isNaN(val) || val < 0 || val > 99) {
+            updateHUDMessage("Format salah! Masukkan angka integer valid antara rentang 0 s.d 99.");
+            return;
+        }
+
+        const isDuplicate = checkDuplicateValue(currentTree, val);
+        if (isDuplicate) {
+            updateHUDMessage(`Nilai ${val} sudah ada di dalam pohon! Masukkan nilai lain agar pohon biner rapi.`);
+            return;
+        }
+
+        currentTree = insertBSTValue(currentTree, val);
+        sounds.success();
+        updateHUDMessage(`Simpul bernilai ${val} berhasil dimasukkan ke dalam pohon biner.`);
+        inputValDom.value = '';
+        drawTree();
+    }
+
+    function insertBSTValue(root, val) {
+        if (!root) {
+            return new TreeNode(val);
+        }
+        if (val < root.val) {
+            root.left = insertBSTValue(root.left, val);
+        } else if (val > root.val) {
+            root.right = insertBSTValue(root.right, val);
+        }
+        return root;
+    }
+
+    function checkDuplicateValue(root, val) {
+        if (!root) return false;
+        if (root.val === val) return true;
+        if (val < root.val) return checkDuplicateValue(root.left, val);
+        return checkDuplicateValue(root.right, val);
+    }
+
+    function clearSandboxTree() {
+        sounds.click();
+        currentTree = null;
+        sandboxSimulatingNodes = [];
+        sandboxSimulatingIndex = -1;
+        updateHUDMessage("Pohon dibersihkan kembali kosong.");
+        drawTree();
+    }
+
+    function generateRandomSandboxTree() {
+        sounds.click();
+        currentTree = null;
+        sandboxSimulatingNodes = [];
+        sandboxSimulatingIndex = -1;
+
+        const randoms = [];
+        while (randoms.length < 7) {
+            const num = Math.floor(Math.random() * 85) + 10;
+            if (!randoms.includes(num)) {
+                randoms.push(num);
+            }
+        }
+
+        randoms.forEach(val => {
+            currentTree = insertBSTValue(currentTree, val);
+        });
+        updateHUDMessage("Berhasil menumbuhkan pohon biner acak baru!");
+        drawTree();
+    }
+
+    // TRIGGER VISUAL AUTO SIMULATIONS (DFS/BFS)
+    function triggerSandboxSimulation(type) {
+        if (!currentTree) {
+            updateHUDMessage("Pohon kosong! Isi pohon biner terlebih dahulu sebelum menjalankan simulasi.");
+            return;
+        }
+        sounds.click();
+        sandboxSimulatingNodes = [];
+        sandboxSimulatingIndex = 0;
+
+        if (type === 'dfs-pre') {
+            runDFSPre(currentTree);
+            updateHUDMessage("Menjalankan Simulasi DFS Pre-Order (Root → Kiri → Kanan)...");
+        } else if (type === 'dfs-in') {
+            runDFSIn(currentTree);
+            updateHUDMessage("Menjalankan Simulasi DFS In-Order (Kiri → Root → Kanan)...");
+        } else if (type === 'dfs-post') {
+            runDFSPost(currentTree);
+            updateHUDMessage("Menjalankan Simulasi DFS Post-Order (Kiri → Kanan → Root)...");
+        } else if (type === 'bfs') {
+            runBFS(currentTree);
+            updateHUDMessage("Menjalankan Simulasi BFS / Level-Order (Lapis demi lapis)...");
+        }
+
+        animateSandboxSimulation();
+    }
+
+    // Algoritma DFS Pre-Order (Root, Left, Right)
+    function runDFSPre(node) {
+        if (!node) return;
+        sandboxSimulatingNodes.push(node.val);
+        runDFSPre(node.left);
+        runDFSPre(node.right);
+    }
+
+    // Algoritma DFS In-Order (Left, Root, Right)
+    function runDFSIn(node) {
+        if (!node) return;
+        runDFSIn(node.left);
+        sandboxSimulatingNodes.push(node.val);
+        runDFSIn(node.right);
+    }
+
+    // Algoritma DFS Post-Order (Left, Right, Root)
+    function runDFSPost(node) {
+        if (!node) return;
+        runDFSPost(node.left);
+        runDFSPost(node.right);
+        sandboxSimulatingNodes.push(node.val);
+    }
+
+    // Algoritma BFS (Level-Order) menggunakan struktur Queue
+    function runBFS(root) {
+        if (!root) return;
+        const queue = [root];
+        while (queue.length > 0) {
+            const current = queue.shift();
+            sandboxSimulatingNodes.push(current.val);
+            if (current.left) queue.push(current.left);
+            if (current.right) queue.push(current.right);
+        }
+    }
+
+    // Simulating sequence timing
+    function animateSandboxSimulation() {
+        if (sandboxSimulatingIndex < sandboxSimulatingNodes.length) {
+            drawTree();
+            sounds.click();
+            sandboxSimulatingIndex++;
+            setTimeout(animateSandboxSimulation, 1000);
+        } else {
+            setTimeout(() => {
+                sounds.success();
+                updateHUDMessage("Simulasi Penelusuran Selesai!");
+                sandboxSimulatingNodes = [];
+                sandboxSimulatingIndex = -1;
+                drawTree();
+            }, 1000);
+        }
+    }
+
+    /* -----------------------------------------------------------
+     * COMPANION UTILITY FUNCTIONS & HUD RE-ALIGNMENT
+     * ----------------------------------------------------------- */
+    function updateHUDMessage(msg) {
+        document.getElementById('hud-message').innerText = msg;
+    }
+
+    function updateHeartsUI() {
+        const container = document.getElementById('hearts-box');
+        container.innerHTML = '';
+        for (let i = 0; i < 3; i++) {
+            const heart = document.createElement('i');
+            if (i < gameState.lives) {
+                heart.className = "fa-solid fa-heart";
+            } else {
+                heart.className = "fa-regular fa-heart text-slate-600";
+            }
+            container.appendChild(heart);
+        }
+    }
+
+    function padZero(num) {
+        return String(num).padStart(3, '0');
+    }
+
+    function triggerGameOver() {
+        sounds.error();
+        showStatusModal(false, "Misi Gagal", "Anda kehabisan nyawa pelindung! Jangan khawatir, mari coba ulang dan perhatikan aturan DFS / BFS.");
+    }
+
+    /* -----------------------------------------------------------
+     * MODAL EVENT TRIGGERS
+     * ----------------------------------------------------------- */
+    let isLevelSuccessModal = true;
+
+    function showStatusModal(success, title, desc) {
+        isLevelSuccessModal = success;
+        const modal = document.getElementById('game-status-modal');
+        const iconBox = document.getElementById('modal-status-icon-box');
+        const titleDom = document.getElementById('modal-status-title');
+        const descDom = document.getElementById('modal-status-desc');
+        const statScore = document.getElementById('modal-stat-score');
+        const statLevel = document.getElementById('modal-stat-level');
+        const btnPrimary = document.getElementById('modal-btn-next');
+
+        titleDom.innerText = title;
+        descDom.innerText = desc;
+        statScore.innerText = gameState.score;
+        statLevel.innerText = `Lvl ${gameState.level}`;
+
+        if (success) {
+            modal.firstElementChild.className = "bg-[#0a192f] border-2 border-[#64ffda] p-8 rounded-3xl max-w-md w-full text-center relative neon-glow";
+            iconBox.className = "w-20 h-20 rounded-full mx-auto flex items-center justify-center text-4xl mb-6 shadow-lg bg-teal-950 text-[#64ffda]";
+            iconBox.innerHTML = `<i class="fa-solid fa-trophy"></i>`;
+
+            if (gameState.level >= 4) {
+                btnPrimary.innerHTML = `<i class="fa-solid fa-house"></i> Selesai &amp; Ke Menu`;
+            } else {
+                btnPrimary.innerHTML = `Level Berikutnya <i class="fa-solid fa-chevron-right"></i>`;
+            }
+        } else {
+            modal.firstElementChild.className = "bg-[#0a192f] border-2 border-rose-500 p-8 rounded-3xl max-w-md w-full text-center relative neon-glow-error";
+            iconBox.className = "w-20 h-20 rounded-full mx-auto flex items-center justify-center text-4xl mb-6 shadow-lg bg-rose-950 text-rose-500";
+            iconBox.innerHTML = `<i class="fa-solid fa-heart-crack"></i>`;
+            btnPrimary.innerHTML = `<i class="fa-solid fa-arrow-rotate-left"></i> Ulangi Level`;
+        }
+
+        modal.classList.remove('hidden');
+    }
+
+    function closeStatusModal() {
+        document.getElementById('game-status-modal').classList.add('hidden');
+    }
+
+    function modalPrimaryAction() {
+        closeStatusModal();
+        sounds.click();
+
+        if (isLevelSuccessModal) {
+            if (gameState.level < 4) {
+                gameState.level++;
+                if (currentMode === 'bst') {
+                    initBSTGameLevel();
+                } else if (currentMode === 'traversal') {
+                    initTraversalGameLevel();
+                }
+            } else {
+                switchMode('menu');
+            }
+        } else {
+            restartCurrentGame();
+        }
+    }
+
+    function restartCurrentGame() {
+        sounds.click();
+        gameState.lives = 3;
+        if (currentMode === 'bst') {
+            gameState.score = 0;
+            initBSTGameLevel();
+        } else if (currentMode === 'traversal') {
+            gameState.score = 0;
+            initTraversalGameLevel();
+        }
+    }
+
+    function showHelpModal() {
+        sounds.click();
+        document.getElementById('help-modal').classList.remove('hidden');
+    }
+
+    function closeHelpModal() {
+        sounds.click();
+        document.getElementById('help-modal').classList.add('hidden');
+    }
+</script>
+</body>
+</html>
