@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BST Deletion Simulator - Multimedia Interaktif</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            950: '#0b1329',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar styling for a cleaner dark UI */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-900 text-slate-100 flex flex-col font-sans overflow-x-hidden">
+
+<!-- Header -->
+<header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-10 px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+    <div class="flex items-center gap-3">
+        <div class="p-2 bg-indigo-600 rounded-lg text-white">
+            <i data-lucide="layers" class="w-6 h-6"></i>
+        </div>
+        <div>
+            <h1 class="text-xl font-bold tracking-tight bg-gradient-to-r from-indigo-400 via-sky-400 to-emerald-400 bg-clip-text text-transparent">
+                BST Deletion Simulator
+            </h1>
+            <p class="text-xs text-slate-400">Multimedia Interaktif Visualisasi & Algoritma Binary Search Tree</p>
+        </div>
+    </div>
+
+    <div class="flex flex-wrap gap-2 items-center">
+        <button onclick="openModal('teori')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-sm font-medium transition duration-200">
+            <i data-lucide="book-open" class="w-4 h-4 text-indigo-400"></i>
+            <span>Teori BST</span>
+        </button>
+        <button onclick="openModal('bantuan')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-sm font-medium transition duration-200">
+            <i data-lucide="help-circle" class="w-4 h-4 text-emerald-400"></i>
+            <span>Bantuan</span>
+        </button>
+        <button onclick="resetToDefault()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-950/40 hover:bg-indigo-900/50 border border-indigo-800/40 text-indigo-300 text-sm font-medium transition duration-200">
+            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+            <span>Reset Pohon</span>
+        </button>
+    </div>
+</header>
+
+<!-- Main Container -->
+<div class="flex-1 grid grid-cols-1 xl:grid-cols-12 overflow-hidden">
+
+    <!-- Left Column: Interactive Playground & Visualizer (8 cols) -->
+    <main class="xl:col-span-8 flex flex-col border-r border-slate-800 bg-slate-950/40">
+
+        <!-- Preset Scenario Buttons -->
+        <section class="p-4 border-b border-slate-800/60 bg-slate-900/40">
+            <h3 class="text-xs font-semibold text-slate-400 tracking-wider uppercase mb-3 flex items-center gap-2">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-indigo-400"></i> Pilih Skenario Kasus Penghapusan:
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <button id="btn-case-1" onclick="applyScenario(1)" class="p-3 rounded-xl border border-slate-800 bg-slate-900 hover:border-slate-700 hover:bg-slate-800/80 text-left transition duration-200">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded bg-sky-500/20 text-sky-300">KASUS 1</span>
+                        <span class="text-[10px] text-slate-400">Node Leaf</span>
+                    </div>
+                    <h4 class="font-bold text-sm text-slate-200">Tanpa Anak (0 Child)</h4>
+                    <p class="text-xs text-slate-400 mt-1">Contoh: Menghapus node 40 yang berada di ujung bawah pohon.</p>
+                </button>
+
+                <button id="btn-case-2" onclick="applyScenario(2)" class="p-3 rounded-xl border border-slate-800 bg-slate-900 hover:border-slate-700 hover:bg-slate-800/80 text-left transition duration-200">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300">KASUS 2</span>
+                        <span class="text-[10px] text-slate-400">1 Anak</span>
+                    </div>
+                    <h4 class="font-bold text-sm text-slate-200">Memiliki 1 Anak</h4>
+                    <p class="text-xs text-slate-400 mt-1">Contoh: Menghapus node 20 yang hanya memiliki anak kiri (15).</p>
+                </button>
+
+                <button id="btn-case-3" onclick="applyScenario(3)" class="p-3 rounded-xl border border-slate-800 bg-slate-900 hover:border-slate-700 hover:bg-slate-800/80 text-left transition duration-200">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300">KASUS 3</span>
+                        <span class="text-[10px] text-slate-400">2 Anak</span>
+                    </div>
+                    <h4 class="font-bold text-sm text-slate-200">Memiliki 2 Anak</h4>
+                    <p class="text-xs text-slate-400 mt-1">Contoh: Menghapus node 30 yang memiliki anak kiri & kanan.</p>
+                </button>
+            </div>
+        </section>
+
+        <!-- Action Form Controls -->
+        <div class="p-4 bg-slate-900/20 border-b border-slate-800/60 flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div class="flex w-full md:w-auto items-center gap-2">
+                <input
+                        type="number"
+                        id="node-input"
+                        placeholder="Nilai Node..."
+                        class="w-full md:w-36 px-3 py-2 bg-slate-800/90 border border-slate-700 rounded-lg text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+                <button onclick="handleInsert()" class="flex items-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold transition">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                    <span>Sisipkan</span>
+                </button>
+                <button onclick="handleStartDeleteSimulation()" class="flex items-center gap-1.5 px-3 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-xs font-semibold transition">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                    <span>Simulasi Hapus</span>
+                </button>
+                <button onclick="handleDirectDelete()" title="Hapus instan tanpa animasi/langkah" class="px-2.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 rounded-lg text-xs font-semibold transition">
+                    Hapus Instan
+                </button>
+            </div>
+
+            <!-- Status Message Display -->
+            <div id="message-box" class="text-xs px-3 py-2 rounded-lg max-w-md bg-slate-800/80 text-slate-300 border border-slate-700/50">
+                Selamat datang! Pilih skenario kasus di atas atau manipulasi pohon secara bebas.
+            </div>
+        </div>
+
+        <!-- Interactive Simulation Controls (Hidden by default, shown when active) -->
+        <div id="simulation-bar" class="hidden bg-indigo-950/30 border-b border-indigo-900/30 px-6 py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+          <span class="flex h-2.5 w-2.5 relative">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-indigo-500"></span>
+          </span>
+                <span id="simulation-status-text" class="text-xs font-bold text-indigo-300 uppercase tracking-wider">
+            Simulasi Aktif (Langkah 1 dari 1)
+          </span>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button onclick="goToStart()" id="btn-sim-start" class="p-1.5 rounded bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-300 transition" title="Kembali ke Awal">
+                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                </button>
+                <button onclick="stepBackward()" id="btn-sim-prev" class="p-1.5 rounded bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-300 transition" title="Langkah Sebelumnya">
+                    <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                </button>
+                <button onclick="togglePlay()" id="btn-sim-play" class="px-3 py-1.5 rounded bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs flex items-center gap-1 transition">
+                    <i data-lucide="play" class="w-3.5 h-3.5 fill-white"></i> Play
+                </button>
+                <button onclick="stepForward()" id="btn-sim-next" class="p-1.5 rounded bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-300 transition" title="Langkah Selanjutnya">
+                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                </button>
+                <button onclick="handleExitSimulation(true)" class="px-2.5 py-1.5 text-xs text-emerald-400 hover:bg-emerald-950/30 rounded border border-emerald-900/30 font-medium flex items-center gap-1 transition" title="Simpan Hasil Simulasi ke Playground">
+                    <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                    <span>Selesai & Terapkan</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Canvas Area: Dynamic Tree Render -->
+        <div class="flex-1 min-h-[420px] relative overflow-auto p-4 flex justify-center items-center" id="canvas-container">
+            <!-- Legend inside Tree Panel -->
+            <div class="absolute top-4 left-4 bg-slate-900/80 border border-slate-800 rounded-lg p-3 text-[11px] space-y-1.5 z-10 max-w-xs shadow-md">
+                <h5 class="font-semibold text-slate-300 border-b border-slate-800 pb-1 mb-1.5 uppercase tracking-wide">Panduan Visual</h5>
+                <div class="flex items-center gap-2">
+                    <div class="w-3.5 h-3.5 rounded-full bg-slate-800 border border-slate-600"></div>
+                    <span class="text-slate-400">Node Normal</span>
+                </div>
+                <div id="legend-simulation-items" class="space-y-1.5 hidden">
+                    <div class="flex items-center gap-2">
+                        <div class="w-3.5 h-3.5 rounded-full bg-amber-500/20 border-2 border-amber-500"></div>
+                        <span class="text-amber-300 font-medium">Sedang Dicari</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-3.5 h-3.5 rounded-full bg-emerald-500/20 border-2 border-emerald-400"></div>
+                        <span class="text-emerald-300 font-medium">Node Target</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-3.5 h-3.5 rounded-full bg-purple-500/20 border-2 border-purple-400"></div>
+                        <span class="text-purple-300 font-medium">In-order Successor</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-3.5 h-3.5 rounded-full bg-indigo-500/30 border-2 border-indigo-400"></div>
+                        <span class="text-indigo-300 font-medium">Nilai Baru Diperbarui</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-3.5 h-3.5 rounded-full bg-rose-500/20 border-2 border-rose-500 border-dashed"></div>
+                        <span class="text-rose-400 font-medium">Akan Dihapus / Diputus</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Render Target Div (Inside which nodes and SVG will live) -->
+            <div id="tree-viewport" class="w-[800px] h-[450px] relative">
+                <!-- SVG and Nodes dynamically placed here -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Right Column: Explanations & Pseudocode (4 cols) -->
+    <aside class="xl:col-span-4 flex flex-col bg-slate-900/60 overflow-y-auto">
+
+        <!-- Section 1: Detailed Explanations -->
+        <div class="p-5 border-b border-slate-800 flex-1 flex flex-col min-h-[220px]">
+            <h3 class="text-xs font-bold text-slate-400 tracking-wider uppercase mb-3 flex items-center gap-2">
+                <i data-lucide="info" class="w-4 h-4 text-sky-400"></i> Penjelasan Detail Langkah:
+            </h3>
+
+            <div id="explanation-container" class="flex-1 bg-slate-950/20 border border-slate-800 border-dashed rounded-xl p-4 flex flex-col justify-center items-center text-center">
+                <i data-lucide="book-open" class="w-8 h-8 text-slate-700 mb-2"></i>
+                <p class="text-xs text-slate-400 max-w-xs">
+                    Silakan pilih sebuah kasus di atas atau masukkan target hapus untuk memulai langkah demi langkah analisis visual algoritma.
+                </p>
+            </div>
+        </div>
+
+        <!-- Section 2: Pseudocode Highlighter -->
+        <div class="p-5 bg-slate-950/40 flex-1 flex flex-col min-h-[350px]">
+            <h3 class="text-xs font-bold text-slate-400 tracking-wider uppercase mb-3 flex items-center gap-2">
+                <span class="w-1.5 h-3 bg-emerald-500 rounded-full inline-block"></span>
+                Alur Pseudocode (Bahasa Indonesia):
+            </h3>
+
+            <div id="pseudocode-container" class="flex-1 bg-slate-950 rounded-xl p-4 border border-slate-800 font-mono text-[11px] overflow-x-auto space-y-1">
+                <!-- Rendered dynamically -->
+            </div>
+        </div>
+    </aside>
+</div>
+
+<!-- Teori Modal -->
+<div id="modal-teori" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl">
+        <div class="px-6 py-4 border-b border-slate-800 flex justify-between items-center bg-slate-900/60">
+            <h3 class="text-lg font-bold text-slate-100 flex items-center gap-2">
+                <i data-lucide="book-open" class="w-5 h-5 text-indigo-400"></i> Teori Lengkap Deletions BST
+            </h3>
+            <button onclick="closeModal('teori')" class="text-slate-400 hover:text-slate-200 text-sm font-bold bg-slate-800 hover:bg-slate-700 w-8 h-8 rounded-full flex items-center justify-center">✕</button>
+        </div>
+        <div class="p-6 max-h-[70vh] overflow-y-auto space-y-4 text-sm text-slate-300 leading-relaxed">
+            <p>
+                Operasi penghapusan (*Deletion*) pada <strong>Binary Search Tree (BST)</strong> memiliki aturan yang ketat untuk menjaga sifat fundamental dari BST:
+                <em> Nilai di sub-tree kiri selalu lebih kecil dari node induk, dan nilai di sub-tree kanan selalu lebih besar.</em>
+            </p>
+            <div class="space-y-3 mt-4">
+                <div class="bg-slate-950/40 border border-slate-800 p-4 rounded-xl">
+                    <h4 class="font-bold text-slate-200 flex items-center gap-2">
+                        <span class="text-xs px-2 py-0.5 rounded bg-sky-500/20 text-sky-400">Kasus 1</span> Node Tanpa Anak (Leaf Node)
+                    </h4>
+                    <p class="text-xs mt-1 text-slate-400">
+                        Node target tidak memiliki anak sama sekali (terletak di paling ujung bawah). Penghapusan dilakukan dengan langsung memutus link dari parent node menuju node ini dan menyetel referensinya ke <code class="text-rose-400">NULL</code>.
+                    </p>
+                </div>
+                <div class="bg-slate-950/40 border border-slate-800 p-4 rounded-xl">
+                    <h4 class="font-bold text-slate-200 flex items-center gap-2">
+                        <span class="text-xs px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">Kasus 2</span> Node Memiliki 1 Anak
+                    </h4>
+                    <p class="text-xs mt-1 text-slate-400">
+                        Node target hanya memiliki sub-tree kiri atau kanan saja. Kita menghapus node tersebut dan melompati posisinya dengan cara menghubungkan satu-satunya anaknya langsung ke parent dari node yang dihapus (menghubungkan anak langsung ke kakeknya).
+                    </p>
+                </div>
+                <div class="bg-slate-950/40 border border-slate-800 p-4 rounded-xl">
+                    <h4 class="font-bold text-slate-200 flex items-center gap-2">
+                        <span class="text-xs px-2 py-0.5 rounded bg-purple-500/20 text-purple-400">Kasus 3</span> Node Memiliki 2 Anak
+                    </h4>
+                    <p class="text-xs mt-1 text-slate-400">
+                        Ini kasus paling kompleks. Kita tidak bisa langsung memutus jalur karena akan merusak struktur di bawahnya.
+                        <strong>Solusi:</strong>
+                    </p>
+                    <ol class="list-decimal pl-5 mt-2 text-xs space-y-1 text-slate-400">
+                        <li>Cari pengganti ideal: <strong>In-order Successor</strong> (nilai terkecil di sub-tree kanan).</li>
+                        <li>Salin nilai successor tersebut ke node target.</li>
+                        <li>Hapus node successor asli di bagian sub-tree kanan (yang pasti masuk kategori Kasus 1 atau Kasus 2).</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+        <div class="px-6 py-4 border-t border-slate-800 flex justify-end bg-slate-900/40">
+            <button onclick="closeModal('teori')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold transition">Tutup & Kembali</button>
+        </div>
+    </div>
+</div>
+
+<!-- Bantuan Modal -->
+<div id="modal-bantuan" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl">
+        <div class="px-6 py-4 border-b border-slate-800 flex justify-between items-center bg-slate-900/60">
+            <h3 class="text-lg font-bold text-slate-100 flex items-center gap-2">
+                <i data-lucide="help-circle" class="w-5 h-5 text-emerald-400"></i> Panduan Simulator
+            </h3>
+            <button onclick="closeModal('bantuan')" class="text-slate-400 hover:text-slate-200 text-sm font-bold bg-slate-800 hover:bg-slate-700 w-8 h-8 rounded-full flex items-center justify-center">✕</button>
+        </div>
+        <div class="p-6 max-h-[70vh] overflow-y-auto space-y-4 text-sm text-slate-300 leading-relaxed">
+            <div class="space-y-4">
+                <div>
+                    <h4 class="font-bold text-slate-200 mb-1">🎮 Menggunakan Skenario Kasus</h4>
+                    <p class="text-xs text-slate-400">
+                        Tekan tombol salah satu kasus (<strong>Kasus 1</strong>, <strong>Kasus 2</strong>, atau <strong>Kasus 3</strong>) di bagian atas untuk langsung menyusun pohon contoh yang ideal untuk kasus tersebut. Target node otomatis disiapkan di form simulasi.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-slate-200 mb-1">▶️ Pemutaran Simulasi (Playback)</h4>
+                    <p class="text-xs text-slate-400">
+                        Setelah menekan <strong>Simulasi Hapus</strong>, panel kontrol simulasi akan muncul di atas pohon. Anda bisa menekan tombol <strong>Play</strong> untuk menonton otomatisasi jalannya algoritma, atau melangkah manual satu-persatu dengan menekan tombol panah <strong>Chevron (Kiri/Kanan)</strong>.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-slate-200 mb-1">🪵 Bangun Pohon Sendiri (Playground)</h4>
+                    <p class="text-xs text-slate-400">
+                        Ingin menguji pohon buatan Anda sendiri? Masukkan nilai apa saja pada input numerik di atas, lalu tekan <strong>Sisipkan</strong> untuk menambahkan node baru ke BST. Anda juga dapat melakukan <strong>Hapus Instan</strong> jika tidak ingin melewati langkah-demi-langkah simulasi.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="px-6 py-4 border-t border-slate-800 flex justify-end bg-slate-900/40">
+            <button onclick="closeModal('bantuan')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold transition">Tutup & Kembali</button>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="border-t border-slate-800 bg-slate-950/80 px-6 py-3 text-center text-[11px] text-slate-500">
+    &copy; 2026 Simulator Penghapusan Binary Search Tree Interaktif. Dirancang untuk pemahaman struktur data mendalam.
+</footer>
+
+<script>
+    // --- DATA STRUCTURE: BST TreeNode ---
+    class TreeNode {
+        constructor(val) {
+            this.val = val;
+            this.left = null;
+            this.right = null;
+            this.id = Math.random().toString(36).substr(2, 9);
+        }
+    }
+
+    // Deep clone tree helper
+    function cloneTree(node) {
+        if (!node) return null;
+        const newNode = new TreeNode(node.val);
+        newNode.id = node.id;
+        newNode.left = cloneTree(node.left);
+        newNode.right = cloneTree(node.right);
+        return newNode;
+    }
+
+    // Search node helper
+    function findNodeById(node, id) {
+        if (!node) return null;
+        if (node.id === id) return node;
+        return findNodeById(node.left, id) || findNodeById(node.right, id);
+    }
+
+    // Default tree construction
+    function createDefaultTree() {
+        const root = new TreeNode(50);
+        root.left = new TreeNode(30);
+        root.right = new TreeNode(70);
+
+        root.left.left = new TreeNode(20);
+        root.left.right = new TreeNode(40);
+        root.left.left.left = new TreeNode(15);
+
+        root.right.left = new TreeNode(60);
+        root.right.right = new TreeNode(80);
+        root.right.right.right = new TreeNode(85);
+
+        return root;
+    }
+
+    // --- APPLICATION STATE ---
+    let mainTree = null;
+    let simulationSteps = [];
+    let currentStepIndex = -1;
+    let isPlaying = false;
+    let selectedCase = null;
+    let nodeCoords = {};
+    let playInterval = null;
+
+    const pseudocode = [
+        { text: "function hapusNode(node, nilai):", indent: 0 },
+        { text: "if node adalah NULL:", indent: 1 },
+        { text: "return NULL // tidak ditemukan", indent: 2 },
+        { text: "", indent: 0 },
+        { text: "if nilai < node.nilai:", indent: 1 },
+        { text: "node.kiri = hapusNode(node.kiri, nilai)", indent: 2 },
+        { text: "else if nilai > node.nilai:", indent: 1 },
+        { text: "node.kanan = hapusNode(node.kanan, nilai)", indent: 2 },
+        { text: "else: // Node ditemukan!", indent: 1 },
+        { text: "// KASUS 1 & 2: 0 atau 1 Anak", indent: 2 },
+        { text: "if node.kiri adalah NULL:", indent: 2 },
+        { text: "return node.kanan", indent: 3 },
+        { text: "else if node.kanan adalah NULL:", indent: 2 },
+        { text: "return node.kiri", indent: 3 },
+        { text: "", indent: 0 },
+        { text: "// KASUS 3: Memiliki 2 Anak", indent: 2 },
+        { text: "successor = cariNilaiTerkecil(node.kanan)", indent: 2 },
+        { text: "node.nilai = successor.nilai // Copy nilai", indent: 2 },
+        { text: "node.kanan = hapusNode(node.kanan, successor.nilai)", indent: 2 },
+        { text: "", indent: 0 },
+        { text: "return node", indent: 1 }
+    ];
+
+    // --- LIFE CYCLE / INITIALIZATION ---
+    window.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
+        renderPseudocode();
+        resetToDefault();
+    });
+
+    // --- RENDER COMPONENT & DRAWING ---
+    function renderPseudocode() {
+        const container = document.getElementById('pseudocode-container');
+        container.innerHTML = pseudocode.map((line, idx) => {
+            return `
+          <div id="code-line-${idx}" class="py-0.5 px-2 rounded transition-colors duration-200 flex text-slate-400 hover:text-slate-300" style="padding-left: ${line.indent * 16 + 8}px">
+            <span class="w-5 text-slate-600 text-right select-none pr-2">${idx + 1}</span>
+            <span>${line.text}</span>
+          </div>
+        `;
+        }).join('');
+    }
+
+    function calculateCoords(node, x, y, spacingX, level, coords) {
+        if (!node) return;
+        coords[node.id] = { x, y, val: node.val, level };
+        const nextSpacing = spacingX * 0.55;
+
+        if (node.left) {
+            calculateCoords(node.left, x - spacingX, y + 75, nextSpacing, level + 1, coords);
+        }
+        if (node.right) {
+            calculateCoords(node.right, x + spacingX, y + 75, nextSpacing, level + 1, coords);
+        }
+    }
+
+    function updateTreeRendering() {
+        const container = document.getElementById('tree-viewport');
+        container.innerHTML = '';
+
+        const currentStep = currentStepIndex >= 0 ? simulationSteps[currentStepIndex] : null;
+        const currentTree = currentStep ? currentStep.treeSnapshot : mainTree;
+        const highlights = currentStep ? currentStep.highlights : {};
+
+        if (!currentTree) {
+            container.innerHTML = `
+          <div class="absolute inset-0 flex flex-col justify-center items-center text-center p-8">
+            <i data-lucide="layers" class="w-12 h-12 text-slate-600 mb-3"></i>
+            <h4 class="text-slate-300 font-semibold">Pohon Kosong</h4>
+            <p class="text-xs text-slate-500 mt-1 mb-4">Mulai bangun Binary Search Tree baru dengan memasukkan sebuah nilai di atas.</p>
+            <button onclick="resetToDefault()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold transition">
+              Gunakan Pohon Contoh
+            </button>
+          </div>
+        `;
+            lucide.createIcons();
+            return;
+        }
+
+        // Compute dynamic coordinates
+        const coords = {};
+        calculateCoords(currentTree, 400, 50, 180, 1, coords);
+
+        // 1. Build SVG Connections
+        let svgContent = `
+        <svg class="absolute inset-0 w-full h-full pointer-events-none">
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="#475569" />
+            </marker>
+          </defs>
+      `;
+
+        Object.entries(coords).map(([id, currentCoord]) => {
+            const originalNode = findNodeById(currentTree, id);
+            if (!originalNode) return;
+
+            const connect = (childNodeId) => {
+                const childCoord = coords[childNodeId];
+                if (!childCoord) return;
+
+                let strokeColor = "#475569";
+                let strokeWidth = "2";
+                let dashArray = "";
+
+                const parentHighlight = highlights[id];
+                const childHighlight = highlights[childNodeId];
+
+                if (parentHighlight === 'searching' && childHighlight === 'searching') {
+                    strokeColor = "#f59e0b";
+                    strokeWidth = "3";
+                } else if (parentHighlight === 'found' && childHighlight === 'searching') {
+                    strokeColor = "#a855f7";
+                    strokeWidth = "2.5";
+                    dashArray = "4,4";
+                } else if (childHighlight === 'deleted') {
+                    strokeColor = "#ef4444";
+                    strokeWidth = "2.5";
+                    dashArray = "3,3";
+                }
+
+                svgContent += `
+            <line
+              x1="${currentCoord.x}"
+              y1="${currentCoord.y}"
+              x2="${childCoord.x}"
+              y2="${childCoord.y}"
+              stroke="${strokeColor}"
+              stroke-width="${strokeWidth}"
+              stroke-dasharray="${dashArray}"
+              class="transition-all duration-500 ease-in-out"
+            />
+          `;
+            };
+
+            if (originalNode.left && findNodeById(currentTree, originalNode.left.id)) {
+                connect(originalNode.left.id);
+            }
+            if (originalNode.right && findNodeById(currentTree, originalNode.right.id)) {
+                connect(originalNode.right.id);
+            }
+        });
+
+        svgContent += `</svg>`;
+        container.innerHTML += svgContent;
+
+        // 2. Build Nodes HTML Markup
+        Object.entries(coords).map(([id, coord]) => {
+            const currentNodeInTree = findNodeById(currentTree, id);
+            if (!currentNodeInTree) return;
+
+            const nodeState = highlights[id] || 'normal';
+            let borderClass = "border-slate-600 bg-slate-800 text-slate-100 hover:bg-slate-700";
+            let shadowStyle = "";
+            let tooltipText = "";
+
+            if (nodeState === 'searching') {
+                borderClass = "border-amber-500 bg-amber-950/80 text-amber-300 ring-4 ring-amber-500/20";
+                shadowStyle = "box-shadow: 0 0 15px rgba(245,158,11,0.4);";
+                tooltipText = "Checking";
+            } else if (nodeState === 'found') {
+                borderClass = "border-emerald-400 bg-emerald-950/80 text-emerald-200 ring-4 ring-emerald-500/30";
+                shadowStyle = "box-shadow: 0 0 20px rgba(52,211,153,0.5);";
+                tooltipText = "Target";
+            } else if (nodeState === 'successor') {
+                borderClass = "border-purple-400 bg-purple-950/80 text-purple-200 ring-4 ring-purple-500/30 animate-pulse";
+                shadowStyle = "box-shadow: 0 0 20px rgba(168,85,247,0.5);";
+                tooltipText = "Successor";
+            } else if (nodeState === 'replacing') {
+                borderClass = "border-indigo-400 bg-indigo-950/90 text-indigo-200 ring-4 ring-indigo-500/30";
+                shadowStyle = "box-shadow: 0 0 25px rgba(99,102,241,0.6);";
+                tooltipText = "Updated";
+            } else if (nodeState === 'deleted') {
+                borderClass = "border-rose-500 border-dashed bg-rose-950/40 text-rose-300 animate-ping";
+                tooltipText = "Delete";
+            }
+
+            const tooltipColorClass =
+                nodeState === 'searching' ? 'text-amber-400' :
+                    nodeState === 'found' ? 'text-emerald-400' :
+                        nodeState === 'successor' ? 'text-purple-400' :
+                            nodeState === 'replacing' ? 'text-indigo-300' : 'text-rose-400';
+
+            const nodeHTML = `
+          <div
+            style="position: absolute; left: ${coord.x}px; top: ${coord.y}px; transform: translate(-50%, -50%);"
+            class="transition-all duration-500 ease-in-out z-10"
+          >
+            <div
+              style="${shadowStyle}"
+              class="w-11 h-11 rounded-full flex items-center justify-center border-2 font-bold text-sm select-none transition-all ${borderClass}"
+            >
+              ${currentNodeInTree.val}
+            </div>
+
+            ${nodeState !== 'normal' ? `
+              <div class="absolute top-12 left-1/2 -translate-x-1/2 bg-slate-900 border border-slate-700/80 rounded px-2 py-0.5 whitespace-nowrap z-20 shadow-lg">
+                <span class="text-[9px] font-bold uppercase tracking-wider ${tooltipColorClass}">
+                  ${tooltipText}
+                </span>
+              </div>
+            ` : ''}
+          </div>
+        `;
+            container.innerHTML += nodeHTML;
+        });
+
+        // Update active code highlight & explanation container
+        updateCodeAndExplanationRendering(currentStep);
+    }
+
+    function updateCodeAndExplanationRendering(step) {
+        // Clear current highlights
+        const lines = document.querySelectorAll('#pseudocode-container > div');
+        lines.forEach(line => {
+            line.className = "py-0.5 px-2 rounded transition-colors duration-200 flex text-slate-400 hover:text-slate-300";
+        });
+
+        const explanationContainer = document.getElementById('explanation-container');
+
+        if (step) {
+            // Highlight active pseudocode lines
+            step.codeLines.forEach(lineIdx => {
+                const activeLine = document.getElementById(`code-line-${lineIdx}`);
+                if (activeLine) {
+                    activeLine.className = "py-0.5 px-2 rounded transition-colors duration-200 flex bg-indigo-900/40 text-indigo-200 border-l-2 border-indigo-500 font-semibold";
+                }
+            });
+
+            // Update Explanation Card
+            explanationContainer.className = "flex-1 bg-slate-950/60 rounded-xl p-4 border border-slate-800 flex flex-col justify-between text-left";
+
+            let customTips = "Algoritma selalu memulai pencarian dari ROOT (node paling atas).";
+            if (step.description.includes("2 anak")) {
+                customTips = "Ketika menghapus node dengan 2 anak, kita memindahkan beban ke sub-tree kanan untuk mempertahankan hukum BST (Kiri < Node < Kanan).";
+            } else if (step.description.includes("1 anak")) {
+                customTips = "Anak dari node yang dihapus langsung dihubungkan ke kakeknya (parent dari node yang dihapus).";
+            } else if (step.description.includes("tidak memiliki anak")) {
+                customTips = "Karena tidak ada sub-tree di bawahnya, node ini langsung diputus tanpa merusak struktur bagian atas.";
+            }
+
+            explanationContainer.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[10px] font-extrabold uppercase tracking-widest px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300">
+                Langkah ${currentStepIndex + 1}
+              </span>
+              <span class="text-[10px] text-slate-500 font-mono">
+                Ulasan: ${Object.values(step.highlights).join(', ') || 'Navigasi'}
+              </span>
+            </div>
+            <p class="text-sm font-medium text-slate-200 leading-relaxed">
+              ${step.description}
+            </p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-800/80">
+            <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wide mb-1 flex items-center gap-1">
+              <span>💡 Tips BST:</span>
+            </h4>
+            <p class="text-[11px] text-slate-500 leading-normal">
+              ${customTips}
+            </p>
+          </div>
+        `;
+        } else {
+            explanationContainer.className = "flex-1 bg-slate-950/20 border border-slate-800 border-dashed rounded-xl p-4 flex flex-col justify-center items-center text-center";
+            explanationContainer.innerHTML = `
+          <i data-lucide="book-open" class="w-8 h-8 text-slate-700 mb-2 animate-bounce"></i>
+          <p class="text-xs text-slate-400 max-w-xs">
+            Silakan pilih sebuah kasus di atas atau masukkan target hapus untuk memulai langkah demi langkah analisis visual algoritma.
+          </p>
+        `;
+            lucide.createIcons();
+        }
+    }
+
+    // --- LOGIC: BST SCENARIOS AND PLAYGROUND ACTIONS ---
+    function applyScenario(caseType) {
+        const defaultTree = createDefaultTree();
+        mainTree = defaultTree;
+        selectedCase = caseType;
+        isPlaying = false;
+        clearInterval(playInterval);
+
+        let target = null;
+        let deskripsi = "";
+
+        if (caseType === 1) {
+            target = 40;
+            deskripsi = "Skenario Kasus 1: Menghapus Node 40 (Leaf Node / Tidak memiliki anak). Proses ini sangat sederhana karena kita hanya perlu memutus hubungan dari parent-nya.";
+        } else if (caseType === 2) {
+            target = 20;
+            deskripsi = "Skenario Kasus 2: Menghapus Node 20 (Memiliki 1 anak, yaitu 15). Node yang dihapus akan digantikan langsung oleh satu-satunya anak yang dimilikinya.";
+        } else if (caseType === 3) {
+            target = 30;
+            deskripsi = "Skenario Kasus 3: Menghapus Node 30 (Memiliki 2 anak, yaitu sub-tree 20 dan 40). Kita harus mencari In-order Successor (nilai terkecil di sub-tree kanan, yaitu 40) untuk menggantikan posisinya.";
+        }
+
+        updateMessageBox(deskripsi, 'case');
+        document.getElementById('node-input').value = target;
+
+        // Reset style classes for active scenario buttons
+        for(let i=1; i<=3; i++) {
+            const btn = document.getElementById(`btn-case-${i}`);
+            if(i === caseType) {
+                btn.className = "p-3 rounded-xl border text-left transition duration-200 bg-indigo-950/80 border-indigo-500 shadow-lg shadow-indigo-950/50";
+            } else {
+                btn.className = "p-3 rounded-xl border border-slate-800 bg-slate-900 hover:border-slate-700 hover:bg-slate-800/80 text-left transition duration-200";
+            }
+        }
+
+        generateDeleteSimulation(defaultTree, target);
+    }
+
+    function resetToDefault() {
+        mainTree = createDefaultTree();
+        simulationSteps = [];
+        currentStepIndex = -1;
+        isPlaying = false;
+        selectedCase = null;
+        clearInterval(playInterval);
+        document.getElementById('node-input').value = '';
+        hideSimulationBar();
+        updateTreeRendering();
+        updateMessageBox('Pohon berhasil diatur ulang ke kondisi default.', 'success');
+
+        for(let i=1; i<=3; i++) {
+            const btn = document.getElementById(`btn-case-${i}`);
+            btn.className = "p-3 rounded-xl border border-slate-800 bg-slate-900 hover:border-slate-700 hover:bg-slate-800/80 text-left transition duration-200";
+        }
+    }
+
+    function handleInsert() {
+        const valInput = document.getElementById('node-input').value;
+        const val = parseInt(valInput);
+        if (isNaN(val)) {
+            updateMessageBox('Masukkan angka yang valid.', 'error');
+            return;
+        }
+
+        handleExitSimulation(false);
+
+        let valExists = false;
+        const checkExists = (node) => {
+            if (!node) return;
+            if (node.val === val) valExists = true;
+            checkExists(node.left);
+            checkExists(node.right);
+        };
+        checkExists(mainTree);
+
+        if (valExists) {
+            updateMessageBox(`Node ${val} sudah ada di dalam pohon. BST tidak boleh memiliki nilai duplikat!`, 'error');
+            return;
+        }
+
+        const insertNode = (node, value) => {
+            if (!node) return new TreeNode(value);
+            if (value < node.val) {
+                node.left = insertNode(node.left, value);
+            } else {
+                node.right = insertNode(node.right, value);
+            }
+            return node;
+        };
+
+        if (!mainTree) {
+            mainTree = new TreeNode(val);
+        } else {
+            insertNode(mainTree, val);
+        }
+
+        updateTreeRendering();
+        updateMessageBox(`Berhasil menambahkan node ${val} ke dalam pohon.`, 'success');
+        document.getElementById('node-input').value = '';
+    }
+
+    // --- BST SIMULATOR SYSTEM ---
+    function generateDeleteSimulation(startingTree, targetVal) {
+        if (!startingTree) {
+            updateMessageBox('Pohon kosong. Tidak ada yang bisa dihapus.', 'error');
+            return;
+        }
+
+        const steps = [];
+        let currentTree = cloneTree(startingTree);
+        const dummy = new TreeNode(null);
+        dummy.left = currentTree;
+
+        const logStep = (tempTree, highlightedNodes, currentCodeLines, description) => {
+            steps.push({
+                treeSnapshot: cloneTree(tempTree),
+                highlights: { ...highlightedNodes },
+                codeLines: currentCodeLines,
+                description
+            });
+        };
+
+        let foundNodeId = null;
+
+        const simDelete = (node, parentNode, isLeftChild, key) => {
+            if (!node) {
+                logStep(dummy.left, {}, [2], `Mencari nilai ${key}: Mencapai ujung pohon (NULL). Nilai tidak ditemukan.`);
+                return null;
+            }
+
+            const searchHighlights = { [node.id]: 'searching' };
+            logStep(dummy.left, searchHighlights, [4, 5, 6, 7], `Membandingkan target hapus ${key} dengan nilai node saat ini (${node.val}).`);
+
+            if (key < node.val) {
+                logStep(dummy.left, { [node.id]: 'searching' }, [5], `Karena ${key} < ${node.val}, kita bergerak ke sub-tree KIRI.`);
+                node.left = simDelete(node.left, node, true, key);
+                return node;
+            } else if (key > node.val) {
+                logStep(dummy.left, { [node.id]: 'searching' }, [7], `Karena ${key} > ${node.val}, kita bergerak ke sub-tree KANAN.`);
+                node.right = simDelete(node.right, node, false, key);
+                return node;
+            } else {
+                foundNodeId = node.id;
+                logStep(dummy.left, { [node.id]: 'found' }, [9], `Ditemukan! Node dengan nilai ${node.val} yang ingin dihapus telah ditemukan.`);
+
+                // CASE 1 & 2: 0 or 1 Child
+                if (!node.left && !node.right) {
+                    logStep(dummy.left, { [node.id]: 'deleted' }, [11, 12], `[KASUS 1] Node ${node.val} adalah Leaf Node (tidak punya anak). Node ini dapat langsung dihapus.`);
+                    return null;
+                }
+                else if (!node.left) {
+                    const rightChildId = node.right.id;
+                    const highlights = { [node.id]: 'deleted', [rightChildId]: 'replacing' };
+                    logStep(dummy.left, highlights, [11, 12], `[KASUS 2] Node ${node.val} hanya memiliki 1 anak (anak KANAN: ${node.right.val}). Gantikan posisinya dengan sang anak.`);
+                    return node.right;
+                }
+                else if (!node.right) {
+                    const leftChildId = node.left.id;
+                    const highlights = { [node.id]: 'deleted', [leftChildId]: 'replacing' };
+                    logStep(dummy.left, highlights, [13, 14], `[KASUS 2] Node ${node.val} hanya memiliki 1 anak (anak KIRI: ${node.left.val}). Gantikan posisinya dengan sang anak.`);
+                    return node.left;
+                }
+
+                // CASE 3: Two children
+                logStep(dummy.left, { [node.id]: 'found' }, [16, 17], `[KASUS 3] Node ${node.val} memiliki 2 anak. Kita harus mencari In-order Successor (nilai terkecil di sub-tree KANAN) untuk menggantikan posisinya.`);
+
+                let temp = node.right;
+                const successorPath = [temp.id];
+                logStep(dummy.left, { [node.id]: 'found', [temp.id]: 'searching' }, [17], `Masuk ke sub-tree kanan di node ${temp.val} untuk mulai mencari nilai paling kecil.`);
+
+                while (temp.left) {
+                    temp = temp.left;
+                    successorPath.push(temp.id);
+                    const pathHighlights = { [node.id]: 'found' };
+                    successorPath.forEach(id => {
+                        pathHighlights[id] = id === temp.id ? 'successor' : 'searching';
+                    });
+                    logStep(dummy.left, pathHighlights, [17], `Bergerak ke cabang kiri ke node ${temp.val} untuk mencari nilai minimum.`);
+                }
+
+                const successorId = temp.id;
+                const successorVal = temp.val;
+
+                const foundSuccessorHighlights = {
+                    [node.id]: 'found',
+                    [successorId]: 'successor'
+                };
+                logStep(dummy.left, foundSuccessorHighlights, [17], `In-order Successor ditemukan! Nilai terkecil di kanan adalah ${successorVal}.`);
+
+                // Copy successor value to target node IN-PLACE
+                node.val = successorVal;
+
+                const copiedHighlights = {
+                    [node.id]: 'replacing',
+                    [successorId]: 'successor'
+                };
+                logStep(dummy.left, copiedHighlights, [18], `[PENTING] Salin nilai successor (${successorVal}) ke node target. Node atas sekarang bernilai ${successorVal}, menggantikan nilai lama (${key}).`);
+
+                // Recursively delete the successor
+                logStep(dummy.left, { [node.id]: 'replacing', [successorId]: 'searching' }, [19], `Sekarang, kita harus menghapus node successor asli (${successorVal}) yang berada di sub-tree kanan bawah.`);
+                node.right = simDelete(node.right, node, false, successorVal);
+
+                return node;
+            }
+        };
+
+        dummy.left = simDelete(dummy.left, dummy, true, targetVal);
+        currentTree = dummy.left;
+
+        if (!foundNodeId) {
+            updateMessageBox(`Gagal simulasi: Node ${targetVal} tidak ditemukan di pohon.`, 'error');
+            return;
+        }
+
+        // Final step
+        logStep(currentTree, {}, [21], `Proses selesai! Nilai ${targetVal} berhasil dihapus dan struktur BST tetap seimbang.`);
+
+        simulationSteps = steps;
+        currentStepIndex = 0;
+        showSimulationBar();
+        updateTreeRendering();
+        updateMessageBox(`Simulasi penghapusan ${targetVal} siap. Tekan Play atau gunakan navigasi langkah.`, 'info');
+    }
+
+    function handleStartDeleteSimulation() {
+        const valInput = document.getElementById('node-input').value;
+        const val = parseInt(valInput);
+        if (isNaN(val)) {
+            updateMessageBox('Masukkan angka yang valid untuk dihapus.', 'error');
+            return;
+        }
+        generateDeleteSimulation(mainTree, val);
+    }
+
+    function handleExitSimulation(applyChanges = true) {
+        if (applyChanges && simulationSteps.length > 0) {
+            const finalTree = simulationSteps[simulationSteps.length - 1].treeSnapshot;
+            mainTree = finalTree;
+            updateMessageBox('Simulasi selesai. Struktur pohon baru telah diterapkan.', 'success');
+        }
+        simulationSteps = [];
+        currentStepIndex = -1;
+        isPlaying = false;
+        clearInterval(playInterval);
+        hideSimulationBar();
+        updateTreeRendering();
+    }
+
+    function handleDirectDelete() {
+        const valInput = document.getElementById('node-input').value;
+        const val = parseInt(valInput);
+        if (isNaN(val)) return;
+
+        const deleteNode = (node, key) => {
+            if (!node) return null;
+            if (key < node.val) {
+                node.left = deleteNode(node.left, key);
+            } else if (key > node.val) {
+                node.right = deleteNode(node.right, key);
+            } else {
+                if (!node.left) return node.right;
+                if (!node.right) return node.left;
+
+                let temp = node.right;
+                while (temp.left) {
+                    temp = temp.left;
+                }
+                node.val = temp.val;
+                node.right = deleteNode(node.right, temp.val);
+            }
+            return node;
+        };
+
+        mainTree = deleteNode(cloneTree(mainTree), val);
+        simulationSteps = [];
+        currentStepIndex = -1;
+        isPlaying = false;
+        clearInterval(playInterval);
+        hideSimulationBar();
+        updateTreeRendering();
+        document.getElementById('node-input').value = '';
+        updateMessageBox(`Node ${val} berhasil dihapus secara instan.`, 'success');
+    }
+
+    // --- PLAYBACK ENGINE CONTROLS ---
+    function togglePlay() {
+        isPlaying = !isPlaying;
+        const btn = document.getElementById('btn-sim-play');
+
+        if (isPlaying) {
+            btn.innerHTML = `<i data-lucide="pause" class="w-3.5 h-3.5 fill-white"></i> Pause`;
+            lucide.createIcons();
+            playInterval = setInterval(() => {
+                if (currentStepIndex < simulationSteps.length - 1) {
+                    currentStepIndex++;
+                    updateSimulationUI();
+                    updateTreeRendering();
+                } else {
+                    togglePlay(); // Auto-pause at end
+                }
+            }, 2000);
+        } else {
+            btn.innerHTML = `<i data-lucide="play" class="w-3.5 h-3.5 fill-white"></i> Play`;
+            lucide.createIcons();
+            clearInterval(playInterval);
+        }
+    }
+
+    function stepForward() {
+        if (currentStepIndex < simulationSteps.length - 1) {
+            currentStepIndex++;
+            if (isPlaying) togglePlay();
+            updateSimulationUI();
+            updateTreeRendering();
+        }
+    }
+
+    function stepBackward() {
+        if (currentStepIndex > 0) {
+            currentStepIndex--;
+            if (isPlaying) togglePlay();
+            updateSimulationUI();
+            updateTreeRendering();
+        }
+    }
+
+    function goToStart() {
+        currentStepIndex = 0;
+        if (isPlaying) togglePlay();
+        updateSimulationUI();
+        updateTreeRendering();
+    }
+
+    // --- UI VIEW HELPERS ---
+    function showSimulationBar() {
+        document.getElementById('simulation-bar').classList.remove('hidden');
+        document.getElementById('legend-simulation-items').classList.remove('hidden');
+        updateSimulationUI();
+    }
+
+    function hideSimulationBar() {
+        document.getElementById('simulation-bar').classList.add('hidden');
+        document.getElementById('legend-simulation-items').classList.add('hidden');
+    }
+
+    function updateSimulationUI() {
+        const totalSteps = simulationSteps.length;
+        document.getElementById('simulation-status-text').innerText = `Simulasi Aktif (Langkah ${currentStepIndex + 1} dari ${totalSteps})`;
+
+        // Handle button disabled state
+        document.getElementById('btn-sim-start').disabled = currentStepIndex === 0;
+        document.getElementById('btn-sim-prev').disabled = currentStepIndex === 0;
+        document.getElementById('btn-sim-next').disabled = currentStepIndex === totalSteps - 1;
+    }
+
+    function updateMessageBox(text, type) {
+        const box = document.getElementById('message-box');
+        box.innerText = text;
+        box.className = "text-xs px-3 py-2 rounded-lg max-w-md " +
+            (type === 'error' ? 'bg-rose-950/40 text-rose-300 border border-rose-800/30' :
+                type === 'success' ? 'bg-emerald-950/40 text-emerald-300 border border-emerald-800/30' :
+                    type === 'case' ? 'bg-indigo-950/50 text-indigo-200 border border-indigo-800/40' :
+                        'bg-slate-800/80 text-slate-300 border border-slate-700/50');
+    }
+
+    function openModal(id) {
+        document.getElementById(`modal-${id}`).classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+        document.getElementById(`modal-${id}`).classList.add('hidden');
+    }
+</script>
+</body>
+</html>
