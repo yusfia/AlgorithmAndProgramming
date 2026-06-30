@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TreeCraft: Petualangan Binary Tree</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .code-font {
+      font-family: 'Fira Code', monospace;
+    }
+    /* Custom animations */
+    @keyframes pulse-slow {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.03); }
+    }
+    .pulse-active {
+      animation: pulse-slow 2s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden">
+
+<!-- Header -->
+<header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50 px-4 py-3">
+  <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+    <div class="flex items-center gap-3">
+      <div class="bg-indigo-600 p-2.5 rounded-xl shadow-lg shadow-indigo-500/30">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" class="opacity-30" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0l-4 4m4-4l4 4" />
+        </svg>
+      </div>
+      <div>
+        <h1 class="text-xl font-extrabold tracking-tight text-white flex items-center gap-2">
+          TreeCraft <span class="text-xs bg-indigo-500/20 text-indigo-400 px-2.5 py-0.5 rounded-full font-semibold border border-indigo-500/30">Edisi Binary Tree</span>
+        </h1>
+        <p class="text-xs text-slate-400">Kuasai konsep Full, Complete, Perfect, dan Balanced Binary Tree</p>
+      </div>
+    </div>
+
+    <!-- Mode Selector -->
+    <div class="flex flex-wrap bg-slate-800 p-1.5 rounded-xl border border-slate-700/60 w-full md:w-auto gap-1">
+      <button id="btn-materi" onclick="switchMode('materi')" class="flex-1 md:flex-none px-3 py-1.5 rounded-lg text-xs md:text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-slate-200">
+        📚 Materi
+      </button>
+      <button id="btn-challenge" onclick="switchMode('challenge')" class="flex-1 md:flex-none px-3 py-1.5 rounded-lg text-xs md:text-sm font-semibold transition-all duration-200 bg-indigo-600 text-white shadow">
+        🏆 Tantangan
+      </button>
+      <button id="btn-quiz" onclick="switchMode('quiz')" class="flex-1 md:flex-none px-3 py-1.5 rounded-lg text-xs md:text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-slate-200">
+        ❓ Tebak Tipe
+      </button>
+      <button id="btn-sandbox" onclick="switchMode('sandbox')" class="flex-1 md:flex-none px-3 py-1.5 rounded-lg text-xs md:text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-slate-200">
+        🔬 Lab Bebas
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Main Content -->
+<main class="max-w-7xl mx-auto p-4 w-full flex-grow grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+
+  <!-- MATERI PANEL: Full Width Content (Hidden by default) -->
+  <div id="materi-panel" class="hidden lg:col-span-12 flex flex-col gap-6">
+    <div class="bg-slate-800/60 border border-slate-700/60 rounded-3xl p-6 md:p-8 shadow-2xl">
+      <div class="max-w-3xl">
+        <span class="text-xs font-bold tracking-wider text-indigo-400 uppercase">Modul Pembelajaran</span>
+        <h2 class="text-3xl font-extrabold text-white mt-2">Memahami Jenis-Jenis Binary Tree</h2>
+        <p class="text-slate-300 mt-3 leading-relaxed">
+          Binary Tree (Pohon Biner) adalah struktur data hierarkis di mana setiap elemen (disebut node) memiliki paling banyak dua anak, yang biasa disebut sebagai **anak kiri (left child)** dan **anak kanan (right child)**. Berdasarkan bentuk struktur dan penempatan nodenya, binary tree diklasifikasikan menjadi beberapa jenis penting berikut ini.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+        <!-- Card 1: Full Binary Tree -->
+        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 hover:border-indigo-500/30 transition duration-300 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-lg font-bold text-white">1. Full Binary Tree</h3>
+              <span class="bg-indigo-500/10 text-indigo-400 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-indigo-500/20">Strictly</span>
+            </div>
+            <p class="text-sm text-slate-300 leading-relaxed">
+              Sebuah pohon biner di mana <strong>setiap node memiliki tepat 0 atau 2 anak</strong>. Tidak boleh ada satu pun node di dalam pohon ini yang hanya memiliki anak tunggal.
+            </p>
+            <div class="mt-4 bg-slate-950/40 p-3 rounded-xl border border-slate-800/80">
+              <p class="text-xs text-amber-400 font-semibold mb-1">Ciri Utama:</p>
+              <p class="text-xs text-slate-400">Node anak &ne; 1. Jika ada cabang, wajib bercabang dua.</p>
+            </div>
+          </div>
+          <button onclick="loadSandboxPreset('full')" class="mt-5 w-full bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white border border-indigo-500/30 font-semibold text-xs py-2 rounded-lg transition duration-200">
+            🔬 Uji di Lab Bebas
+          </button>
+        </div>
+
+        <!-- Card 2: Complete Binary Tree -->
+        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 hover:border-indigo-500/30 transition duration-300 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-lg font-bold text-white">2. Complete Binary Tree</h3>
+              <span class="bg-sky-500/10 text-sky-400 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-sky-500/20">Rata Kiri</span>
+            </div>
+            <p class="text-sm text-slate-300 leading-relaxed">
+              Semua tingkatan (level) terisi penuh kecuali mungkin tingkat terakhir. Khusus pada tingkat terakhir, semua node wajib <strong>terisi rapat dari sisi kiri ke kanan</strong> tanpa ada celah kosong.
+            </p>
+            <div class="mt-4 bg-slate-950/40 p-3 rounded-xl border border-slate-800/80">
+              <p class="text-xs text-amber-400 font-semibold mb-1">Ciri Utama:</p>
+              <p class="text-xs text-slate-400">Pengisian bertahap & adil dari kiri. Sangat krusial untuk struktur data <em>Binary Heap</em>.</p>
+            </div>
+          </div>
+          <button onclick="loadSandboxPreset('complete')" class="mt-5 w-full bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white border border-indigo-500/30 font-semibold text-xs py-2 rounded-lg transition duration-200">
+            🔬 Uji di Lab Bebas
+          </button>
+        </div>
+
+        <!-- Card 3: Perfect Binary Tree -->
+        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 hover:border-indigo-500/30 transition duration-300 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-lg font-bold text-white">3. Perfect Binary Tree</h3>
+              <span class="bg-emerald-500/10 text-emerald-400 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-emerald-500/20">Sempurna</span>
+            </div>
+            <p class="text-sm text-slate-300 leading-relaxed">
+              Kasus ideal di mana semua internal node memiliki tepat 2 anak, dan <strong>semua leaf node (ujung daun) berada pada level kedalaman yang sama</strong>.
+            </p>
+            <div class="mt-4 bg-slate-950/40 p-3 rounded-xl border border-slate-800/80">
+              <p class="text-xs text-amber-400 font-semibold mb-1">Rumus Kapasitas:</p>
+              <p class="text-xs text-slate-400 font-mono">Jumlah node n = $2^{h} - 1$ <br>(h = tinggi pohon)</p>
+            </div>
+          </div>
+          <button onclick="loadSandboxPreset('perfect')" class="mt-5 w-full bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white border border-indigo-500/30 font-semibold text-xs py-2 rounded-lg transition duration-200">
+            🔬 Uji di Lab Bebas
+          </button>
+        </div>
+
+        <!-- Card 4: Balanced Binary Tree -->
+        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 hover:border-indigo-500/30 transition duration-300 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-lg font-bold text-white">4. Balanced Binary Tree</h3>
+              <span class="bg-purple-500/10 text-purple-400 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-purple-500/20">Seimbang</span>
+            </div>
+            <p class="text-sm text-slate-300 leading-relaxed">
+              Sebuah pohon biner di mana selisih tinggi (kedalaman) antara sub-pohon kiri dan sub-pohon kanan untuk setiap node <strong>tidak pernah lebih dari 1</strong>.
+            </p>
+            <div class="mt-4 bg-slate-950/40 p-3 rounded-xl border border-slate-800/80">
+              <p class="text-xs text-amber-400 font-semibold mb-1">Ciri Utama:</p>
+              <p class="text-xs text-slate-400">Menjamin efisiensi waktu pencarian konstan $O(\log n)$ (contoh: AVL Tree, Red-Black Tree).</p>
+            </div>
+          </div>
+          <button onclick="loadSandboxPreset('balanced')" class="mt-5 w-full bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white border border-indigo-500/30 font-semibold text-xs py-2 rounded-lg transition duration-200">
+            🔬 Uji di Lab Bebas
+          </button>
+        </div>
+
+        <!-- Card 5: Degenerate Tree -->
+        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 hover:border-indigo-500/30 transition duration-300 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-lg font-bold text-white">5. Degenerate (Pathological)</h3>
+              <span class="bg-red-500/10 text-red-400 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-red-500/20">Linear</span>
+            </div>
+            <p class="text-sm text-slate-300 leading-relaxed">
+              Kondisi terburuk di mana setiap internal node hanya memiliki satu anak. Akibatnya, struktur pohon memanjang linear ke bawah.
+            </p>
+            <div class="mt-4 bg-slate-950/40 p-3 rounded-xl border border-slate-800/80">
+              <p class="text-xs text-amber-400 font-semibold mb-1">Dampak Buruk:</p>
+              <p class="text-xs text-slate-400">Kehilangan fungsi efisiensi pohon; kecepatan pencarian menurun drastis menjadi linear $O(n)$ layaknya Linked List.</p>
+            </div>
+          </div>
+          <button onclick="loadSandboxPreset('degenerate')" class="mt-5 w-full bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white border border-indigo-500/30 font-semibold text-xs py-2 rounded-lg transition duration-200">
+            🔬 Uji di Lab Bebas
+          </button>
+        </div>
+
+        <!-- Card 6: Ikhtisar Hubungan -->
+        <div class="bg-indigo-950/30 border border-indigo-800/40 rounded-2xl p-5 flex flex-col justify-between">
+          <div>
+            <h3 class="text-lg font-bold text-indigo-300 mb-3 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+              </svg>
+              Hubungan Logika
+            </h3>
+            <p class="text-xs text-slate-300 leading-relaxed space-y-2">
+              Berikut ringkasan hubungan hierarkis antar-pohon yang perlu Anda ingat:
+            </p>
+            <ul class="list-disc pl-5 text-xs text-slate-400 space-y-1.5 mt-2">
+              <li>Setiap <strong class="text-slate-200">Perfect Tree</strong> sudah pasti merupakan <strong class="text-slate-200">Complete</strong> dan <strong class="text-slate-200">Full Tree</strong>.</li>
+              <li>Sebuah <strong class="text-slate-200">Complete Tree</strong> belum tentu merupakan <strong class="text-slate-200">Full Tree</strong> (misal node genap yang punya anak tunggal di level bawah).</li>
+              <li>Sebuah <strong class="text-slate-200">Full Tree</strong> belum tentu seimbang (<strong class="text-slate-200">Balanced</strong>).</li>
+            </ul>
+          </div>
+          <button onclick="switchMode('challenge')" class="mt-5 w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs py-2.5 rounded-lg transition duration-200">
+            🏆 Mulai Uji Tantangan Game!
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Left Panel: Instructions, Control, Score (4 Columns) -->
+  <div id="left-panel" class="lg:col-span-4 flex flex-col gap-4">
+
+    <!-- Dynamic Info Box based on selected mode -->
+    <div class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-5 shadow-xl flex flex-col justify-between flex-grow animate-fade-in">
+
+      <!-- CHALLENGE MODE UI -->
+      <div id="panel-challenge" class="space-y-4">
+        <div class="flex justify-between items-center">
+          <span class="text-xs font-bold tracking-wider text-amber-400 uppercase">Mode Tantangan</span>
+          <span id="challenge-score" class="text-xs bg-slate-700 text-slate-300 px-2 py-1 rounded font-mono">Level 1/5</span>
+        </div>
+        <div>
+          <h2 id="challenge-title" class="text-xl font-extrabold text-white">Buat Pohon Full</h2>
+          <p id="challenge-desc" class="text-sm text-slate-300 mt-2 leading-relaxed">
+            Penyihir struktur data menginginkan sebuah **Full Binary Tree** dengan tepat **5 node**. Ingat, pada Full Tree setiap node harus memiliki tepat 0 atau 2 anak!
+          </p>
+        </div>
+
+        <!-- Rules Reminder Accordion -->
+        <div class="bg-slate-900/50 rounded-xl p-3 border border-slate-800 text-xs text-slate-400 space-y-1">
+          <p class="font-semibold text-slate-300 mb-1">💡 Tips Aturan:</p>
+          <ul class="list-disc pl-4 space-y-1">
+            <li><strong class="text-slate-200">Full:</strong> Semua node punya anak 0 atau 2.</li>
+            <li><strong class="text-slate-200">Complete:</strong> Padat di atas, bawahnya rata kiri.</li>
+            <li><strong class="text-slate-200">Perfect:</strong> Semua level penuh sempurna.</li>
+            <li><strong class="text-slate-200">Balanced:</strong> Selisih tinggi kiri & kanan maks 1.</li>
+          </ul>
+        </div>
+
+        <div class="pt-4 border-t border-slate-700/50 flex flex-col gap-2">
+          <button onclick="checkChallengeAnswer()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-emerald-900/20 transition duration-200 flex items-center justify-center gap-2">
+            <span>Kirim & Periksa Jawaban</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+            </svg>
+          </button>
+          <button onclick="resetTree()" class="text-xs text-slate-400 hover:text-red-400 transition py-2 underline">
+            Reset Pohon (Mulai dari Awal)
+          </button>
+        </div>
+      </div>
+
+      <!-- QUIZ MODE UI -->
+      <div id="panel-quiz" class="hidden space-y-4">
+        <div class="flex justify-between items-center">
+          <span class="text-xs font-bold tracking-wider text-pink-400 uppercase">Mode Tebak Tipe</span>
+          <span id="quiz-score" class="text-xs bg-slate-700 text-slate-300 px-2 py-1 rounded font-mono">Skor: 0/0</span>
+        </div>
+        <div>
+          <h2 class="text-xl font-extrabold text-white">Analisis Pohon di Kanan!</h2>
+          <p class="text-sm text-slate-300 mt-2 leading-relaxed">
+            Perhatikan struktur pohon yang ditampilkan. Manakah dari kategori di bawah ini yang paling tepat menggambarkan pohon tersebut? (Pilihan bisa lebih dari satu!)
+          </p>
+        </div>
+
+        <!-- Multi-selection Choices -->
+        <div class="space-y-2 pt-2">
+          <label class="flex items-center gap-3 p-3 bg-slate-900/60 border border-slate-700/40 rounded-xl cursor-pointer hover:bg-slate-700/20 transition">
+            <input type="checkbox" id="quiz-opt-full" class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 bg-slate-800 border-slate-700">
+            <div class="text-sm">
+              <span class="font-bold block text-slate-200">Full Binary Tree</span>
+              <span class="text-xs text-slate-400">Setiap node memiliki 0 atau 2 anak</span>
+            </div>
+          </label>
+          <label class="flex items-center gap-3 p-3 bg-slate-900/60 border border-slate-700/40 rounded-xl cursor-pointer hover:bg-slate-700/20 transition">
+            <input type="checkbox" id="quiz-opt-complete" class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 bg-slate-800 border-slate-700">
+            <div class="text-sm">
+              <span class="font-bold block text-slate-200">Complete Binary Tree</span>
+              <span class="text-xs text-slate-400">Padat ke atas, level akhir rata kiri</span>
+            </div>
+          </label>
+          <label class="flex items-center gap-3 p-3 bg-slate-900/60 border border-slate-700/40 rounded-xl cursor-pointer hover:bg-slate-700/20 transition">
+            <input type="checkbox" id="quiz-opt-perfect" class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 bg-slate-800 border-slate-700">
+            <div class="text-sm">
+              <span class="font-bold block text-slate-200">Perfect Binary Tree</span>
+              <span class="text-xs text-slate-400">Semua daun sejajar & penuh sempurna</span>
+            </div>
+          </label>
+          <label class="flex items-center gap-3 p-3 bg-slate-900/60 border border-slate-700/40 rounded-xl cursor-pointer hover:bg-slate-700/20 transition">
+            <input type="checkbox" id="quiz-opt-balanced" class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 bg-slate-800 border-slate-700">
+            <div class="text-sm">
+              <span class="font-bold block text-slate-200">Balanced Binary Tree</span>
+              <span class="text-xs text-slate-400">Selisih tinggi kiri-kanan &le; 1</span>
+            </div>
+          </label>
+        </div>
+
+        <div class="pt-4 border-t border-slate-700/50 flex gap-2">
+          <button onclick="checkQuizAnswer()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 px-4 rounded-xl transition duration-150 text-sm">
+            Kirim Jawaban
+          </button>
+          <button onclick="generateQuizTree()" class="bg-slate-700 hover:bg-slate-600 text-white py-2.5 px-4 rounded-xl transition text-sm">
+            Ganti Soal
+          </button>
+        </div>
+      </div>
+
+      <!-- SANDBOX MODE UI -->
+      <div id="panel-sandbox" class="hidden space-y-4">
+        <div class="flex justify-between items-center">
+          <span class="text-xs font-bold tracking-wider text-emerald-400 uppercase">Mode Laboratorium Bebas</span>
+          <span class="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded">Eksperimen Aktif</span>
+        </div>
+        <div>
+          <h2 class="text-xl font-extrabold text-white">Laboratorium Real-Time</h2>
+          <p class="text-sm text-slate-300 mt-2 leading-relaxed">
+            Tambahkan atau hapus node pada kanvas di sebelah kanan. Sistem akan langsung menguji struktur pohon Anda dan mengidentifikasi karakteristiknya di bawah secara dinamis!
+          </p>
+        </div>
+
+        <div class="space-y-3 pt-3 border-t border-slate-700/50">
+          <h3 class="text-xs font-bold uppercase tracking-widest text-slate-400">Status Pohon Saat Ini:</h3>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div id="status-full" class="p-2.5 rounded-xl border border-slate-700 bg-slate-800 text-center transition-all duration-300">
+              <p class="text-xs text-slate-400">Full</p>
+              <span class="text-sm font-bold block text-slate-500">—</span>
+            </div>
+            <div id="status-complete" class="p-2.5 rounded-xl border border-slate-700 bg-slate-800 text-center transition-all duration-300">
+              <p class="text-xs text-slate-400">Complete</p>
+              <span class="text-sm font-bold block text-slate-500">—</span>
+            </div>
+            <div id="status-perfect" class="p-2.5 rounded-xl border border-slate-700 bg-slate-800 text-center transition-all duration-300">
+              <p class="text-xs text-slate-400">Perfect</p>
+              <span class="text-sm font-bold block text-slate-500">—</span>
+            </div>
+            <div id="status-balanced" class="p-2.5 rounded-xl border border-slate-700 bg-slate-800 text-center transition-all duration-300">
+              <p class="text-xs text-slate-400">Balanced</p>
+              <span class="text-sm font-bold block text-slate-500">—</span>
+            </div>
+          </div>
+
+          <!-- Special stats -->
+          <div class="bg-slate-900/40 p-3 rounded-xl border border-slate-800 text-xs text-slate-400 space-y-1.5 font-mono">
+            <div class="flex justify-between">
+              <span>Tinggi Pohon:</span>
+              <span id="stat-height" class="text-indigo-400 font-bold">0</span>
+            </div>
+            <div class="flex justify-between">
+              <span>Jumlah Node:</span>
+              <span id="stat-nodes" class="text-indigo-400 font-bold">0</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-slate-700/50">
+          <button onclick="resetTree()" class="w-full bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold py-2.5 px-4 rounded-xl transition text-sm">
+            Mulai Ulang Kanvas
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Toast / Feedback Modal -->
+    <div id="feedback-toast" class="hidden transform transition-all duration-300 p-4 rounded-xl border flex items-start gap-3 shadow-lg">
+      <div id="toast-icon-box" class="p-1.5 rounded-lg text-white">
+        <!-- Dynamic SVG icon -->
+      </div>
+      <div class="flex-grow">
+        <h4 id="toast-title" class="font-bold text-sm">Berhasil!</h4>
+        <p id="toast-message" class="text-xs text-slate-300 mt-0.5">Penjelasan hasil di sini.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Right Panel: Canvas Interactive Area (8 Columns) -->
+  <div id="right-panel" class="lg:col-span-8 flex flex-col bg-slate-950 border border-slate-800 rounded-3xl overflow-hidden relative min-h-[480px] lg:min-h-[560px] shadow-2xl">
+
+    <!-- Canvas Header Toolbar -->
+    <div class="bg-slate-900/60 border-b border-slate-800/80 px-5 py-3 flex justify-between items-center z-10">
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span class="text-xs font-semibold tracking-wider text-slate-300 uppercase">Kanvas Struktur Pohon</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <!-- Quick action info -->
+        <span id="canvas-instruction-text" class="text-xs text-slate-400 hidden sm:inline">
+                        Klik tombol bulat <span class="bg-indigo-500/20 text-indigo-400 px-1.5 py-0.5 rounded border border-indigo-500/30 font-bold text-[10px]">+</span> di bawah node untuk menambahkan cabang.
+                    </span>
+      </div>
+    </div>
+
+    <!-- Canvas SVG Drawing Container -->
+    <div class="flex-grow relative overflow-auto p-4 flex items-center justify-center min-h-0" id="canvas-scroll-container">
+      <svg id="tree-svg" class="w-full h-full min-w-[600px] min-h-[400px] select-none" style="display: block;">
+        <!-- Lines and nodes will be injected here dynamically -->
+      </svg>
+
+      <!-- Empty state fallback when tree is empty (should rarely happen because root stays) -->
+      <div id="canvas-empty-state" class="hidden absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-slate-950/90">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-slate-700 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        <h3 class="text-lg font-bold text-slate-300">Pohon Kosong</h3>
+        <p class="text-sm text-slate-500 max-w-sm mt-1">Buat root node baru untuk memulai eksperimen.</p>
+        <button onclick="initDefaultTree()" class="mt-4 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-4 py-2 rounded-lg transition">
+          Buat Root Node
+        </button>
+      </div>
+    </div>
+
+    <!-- Visual Legend and Controls Overlay -->
+    <div class="absolute bottom-4 left-4 right-4 bg-slate-900/90 border border-slate-800 p-3.5 rounded-2xl flex flex-wrap gap-x-6 gap-y-2 items-center justify-between text-xs text-slate-400 backdrop-blur">
+      <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
+        <span class="font-semibold text-slate-300">Legenda Kontrol:</span>
+        <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-full bg-indigo-600 border border-indigo-400 inline-block"></span> Node Aktif</span>
+        <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-full bg-slate-800 border border-slate-600 inline-block text-[8px] flex items-center justify-center font-bold text-indigo-400">+</span> Tambah Anak</span>
+        <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-full bg-red-950 border border-red-800 inline-block text-[8px] flex items-center justify-center font-bold text-red-400">×</span> Hapus Node</span>
+      </div>
+      <div class="text-[10px] text-slate-500 font-mono">
+        ID Skema: <span id="schema-id">binary-tree-v1</span>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+<!-- Footer -->
+<footer class="border-t border-slate-800 py-4 px-4 bg-slate-950 text-center">
+  <p class="text-xs text-slate-500">
+    Didesain khusus untuk memahami Struktur Data Binary Tree secara interaktif. Bebas dimodifikasi & disebarluaskan.
+  </p>
+</footer>
+
+<!-- Core Game Logic and Tree Algorithms -->
+<script>
+  // Global Game State
+  let currentMode = 'challenge'; // 'materi', 'challenge', 'quiz', 'sandbox'
+  let currentLevel = 0; // index of active challenge
+  let quizScore = 0;
+  let quizAttempts = 0;
+  let activeTreeRoot = null;
+  let nodeIdCounter = 1;
+
+  // Challenge Levels Configuration
+  const challenges = [
+    {
+      title: "Tingkat 1: Struktur Pohon Full",
+      desc: "Rancang sebuah **Full Binary Tree** dengan tepat **5 node**. <br><br><em>Ingat: Pada Full Binary Tree, setiap node harus memiliki tepat 0 atau 2 anak. Tidak boleh ada node yang sendirian memiliki 1 anak.</em>",
+      validate: (root, size, height) => {
+        return size === 5 && checkFull(root);
+      },
+      successMsg: "Bagus sekali! Semua node memiliki tepat 0 atau 2 anak, dan jumlah total node pas 5!"
+    },
+    {
+      title: "Tingkat 2: Struktur Pohon Complete",
+      desc: "Bangunlah sebuah **Complete Binary Tree** dengan tepat **6 node**. <br><br><em>Aturan Complete Tree: Semua level di atas harus penuh terisi, dan pada level terakhir (level terbawah), node-node wajib terisi rapat dari kiri ke kanan tanpa ada jeda kosong.</em>",
+      validate: (root, size, height) => {
+        return size === 6 && checkComplete(root);
+      },
+      successMsg: "Hebat! Pengisian level terbawah sangat rapat dari kiri ke kanan. Ini adalah Complete Tree dengan 6 node!"
+    },
+    {
+      title: "Tingkat 3: Pohon Sempurna (Perfect Tree)",
+      desc: "Bentuk sebuah **Perfect Binary Tree** dengan tinggi tepat **3** (level root adalah level 1, sehingga memiliki total 3 level). <br><br><em>Ingat rumus Perfect Tree: Semua level harus terisi penuh sempurna sampai ke ujung daun terbawah. Total node untuk tinggi 3 adalah $2^3 - 1 = 7$ node!</em>",
+      validate: (root, size, height) => {
+        return height === 3 && checkPerfect(root);
+      },
+      successMsg: "Sempurna! Semua daun berada pada level yang sama, dan semua level terisi tanpa sisa. Ini adalah Perfect Tree!"
+    },
+    {
+      title: "Tingkat 4: Seimbang Tapi Tidak Lengkap",
+      desc: "Buatlah sebuah **Balanced Binary Tree** yang **TIDAK memenuhi kriteria Complete Tree**, dengan minimal **4 node**. <br><br><em>Tips: Buat selisih tinggi sub-pohon kiri dan kanan maksimal 1, tetapi buat struktur level terbawahnya melompat atau tidak rata kiri agar ia bukan Complete Tree!</em>",
+      validate: (root, size, height) => {
+        return size >= 4 && checkBalanced(root) && !checkComplete(root);
+      },
+      successMsg: "Luar biasa! Analisis cerdas. Pohon Anda seimbang, namun karena ada lubang pengisian pada level terbawah, pohon tersebut bukan Complete Tree."
+    },
+    {
+      title: "Tingkat 5: Pohon Degenerasi (Degenerate Tree)",
+      desc: "Bentuk sebuah **Degenerate Binary Tree** dengan tepat **4 node**. <br><br><em>Pohon degenerasi adalah pohon biner di mana setiap internal node hanya memiliki tepat satu anak. Strukturnya lurus memanjang ke bawah menyerupai linked list tunggal.</em>",
+      validate: (root, size, height) => {
+        return size === 4 && checkDegenerate(root);
+      },
+      successMsg: "Luar biasa! Anda telah menyelesaikan semua tingkat tantangan Binary Tree dengan sangat baik! Kuasai dunia struktur data!"
+    }
+  ];
+
+  // Tree Node Definition
+  class TreeNode {
+    constructor(id, value = '') {
+      this.id = id;
+      this.value = value || String.fromCharCode(65 + (id % 26)); // A, B, C...
+      this.left = null;
+      this.right = null;
+      this.parent = null;
+    }
+  }
+
+  // Initialize default tree (just root node)
+  function initDefaultTree() {
+    nodeIdCounter = 1;
+    activeTreeRoot = new TreeNode(nodeIdCounter, 'A');
+    renderTree();
+    updateSandboxAnalysis();
+  }
+
+  // Reset current active tree
+  function resetTree() {
+    initDefaultTree();
+    showToast("Pohon diatur ulang", "Kanvas dikosongkan ke status root awal.", "info");
+  }
+
+  // Add node helper
+  function addNode(parentId, direction) {
+    const parent = findNodeById(activeTreeRoot, parentId);
+    if (!parent) return;
+
+    nodeIdCounter++;
+    const newNode = new TreeNode(nodeIdCounter);
+    newNode.parent = parent;
+
+    if (direction === 'left' && !parent.left) {
+      parent.left = newNode;
+    } else if (direction === 'right' && !parent.right) {
+      parent.right = newNode;
+    }
+
+    renderTree();
+    updateSandboxAnalysis();
+  }
+
+  // Delete node and all its children
+  function deleteNode(nodeId) {
+    if (activeTreeRoot && activeTreeRoot.id === nodeId) {
+      showToast("Aksi Dilarang", "Tidak dapat menghapus root node. Silakan gunakan tombol reset untuk memulai ulang.", "error");
+      return;
+    }
+
+    const parent = findParentOfNode(activeTreeRoot, nodeId);
+    if (parent) {
+      if (parent.left && parent.left.id === nodeId) {
+        parent.left = null;
+      } else if (parent.right && parent.right.id === nodeId) {
+        parent.right = null;
+      }
+    }
+
+    renderTree();
+    updateSandboxAnalysis();
+  }
+
+  // Traverse to find node
+  function findNodeById(node, id) {
+    if (!node) return null;
+    if (node.id === id) return node;
+    return findNodeById(node.left, id) || findNodeById(node.right, id);
+  }
+
+  function findParentOfNode(node, childId) {
+    if (!node) return null;
+    if ((node.left && node.left.id === childId) || (node.right && node.right.id === childId)) {
+      return node;
+    }
+    return findParentOfNode(node.left, childId) || findParentOfNode(node.right, childId);
+  }
+
+  // Tree Properties Algorithms (Indonesian-localized logic helper)
+  function countNodes(node) {
+    if (!node) return 0;
+    return 1 + countNodes(node.left) + countNodes(node.right);
+  }
+
+  function getHeight(node) {
+    if (!node) return 0;
+    return 1 + Math.max(getHeight(node.left), getHeight(node.right));
+  }
+
+  // 1. Check Full Binary Tree: 0 or 2 children for every node
+  function checkFull(node) {
+    if (!node) return true;
+    // If leaf node
+    if (!node.left && !node.right) return true;
+    // If both children exist, recursively check
+    if (node.left && node.right) {
+      return checkFull(node.left) && checkFull(node.right);
+    }
+    // If only one child exists, it's not a Full tree
+    return false;
+  }
+
+  // 2. Check Complete Binary Tree
+  function checkComplete(node) {
+    if (!node) return true;
+
+    const queue = [node];
+    let flag = false; // Set to true when we encounter a non-full node
+
+    while (queue.length > 0) {
+      const curr = queue.shift();
+
+      // Check left child
+      if (curr.left) {
+        if (flag === true) return false; // If we saw a null node earlier but now see a child, it's not complete
+        queue.push(curr.left);
+      } else {
+        flag = true;
+      }
+
+      // Check right child
+      if (curr.right) {
+        if (flag === true) return false;
+        queue.push(curr.right);
+      } else {
+        flag = true;
+      }
+    }
+    return true;
+  }
+
+  // 3. Check Perfect Binary Tree: Full AND all leaves are at the same depth
+  function checkPerfect(node) {
+    if (!node) return true;
+    const depth = getLeftmostDepth(node);
+    return checkPerfectRecursive(node, depth, 0);
+  }
+
+  function getLeftmostDepth(node) {
+    let d = 0;
+    while (node) {
+      d++;
+      node = node.left;
+    }
+    return d;
+  }
+
+  function checkPerfectRecursive(node, depth, level) {
+    if (!node) return true;
+    // If leaf node
+    if (!node.left && !node.right) {
+      return (depth === level + 1);
+    }
+    // If internal node but doesn't have both children
+    if (!node.left || !node.right) {
+      return false;
+    }
+    return checkPerfectRecursive(node.left, depth, level + 1) &&
+            checkPerfectRecursive(node.right, depth, level + 1);
+  }
+
+  // 4. Check Balanced Binary Tree: height difference of left & right <= 1
+  function checkBalanced(node) {
+    if (!node) return true;
+    const leftHeight = getHeight(node.left);
+    const rightHeight = getHeight(node.right);
+
+    const diff = Math.abs(leftHeight - rightHeight);
+    return diff <= 1 && checkBalanced(node.left) && checkBalanced(node.right);
+  }
+
+  // 5. Check Degenerate Tree: Each internal node has exactly one child
+  function checkDegenerate(node) {
+    if (!node) return true;
+    // Leaf node is fine
+    if (!node.left && !node.right) return true;
+    // If both children exist, it's not degenerate
+    if (node.left && node.right) return false;
+    // Must have exactly one child, continue recursion
+    return checkDegenerate(node.left || node.right);
+  }
+
+  // RENDER ENGINE (SVG Visualization)
+  function renderTree() {
+    const svg = document.getElementById('tree-svg');
+    if (!svg) return;
+    svg.innerHTML = ''; // Clear previous items
+
+    if (!activeTreeRoot) {
+      document.getElementById('canvas-empty-state').classList.remove('hidden');
+      return;
+    } else {
+      document.getElementById('canvas-empty-state').classList.add('hidden');
+    }
+
+    const svgWidth = svg.clientWidth || 700;
+    const initialX = svgWidth / 2;
+    const initialY = 50;
+    const initialSpread = Math.max(svgWidth / 4, 150);
+
+    // Assign layout coordinates recursively
+    assignCoordinates(activeTreeRoot, initialX, initialY, initialSpread);
+
+    // Draw connection lines first so they render under the nodes
+    drawConnections(activeTreeRoot, svg);
+
+    // Draw nodes and active action buttons
+    drawNodes(activeTreeRoot, svg);
+  }
+
+  function assignCoordinates(node, x, y, spread) {
+    if (!node) return;
+    node.x = x;
+    node.y = y;
+
+    const nextY = y + 80;
+    const nextSpread = spread * 0.55;
+
+    if (node.left) {
+      assignCoordinates(node.left, x - spread, nextY, nextSpread);
+    }
+    if (node.right) {
+      assignCoordinates(node.right, x + spread, nextY, nextSpread);
+    }
+  }
+
+  function drawConnections(node, svg) {
+    if (!node) return;
+
+    if (node.left) {
+      createSVGLine(svg, node.x, node.y, node.left.x, node.left.y);
+      drawConnections(node.left, svg);
+    }
+    if (node.right) {
+      createSVGLine(svg, node.x, node.y, node.right.x, node.right.y);
+      drawConnections(node.right, svg);
+    }
+  }
+
+  function createSVGLine(svg, x1, y1, x2, y2) {
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("x1", x1);
+    line.setAttribute("y1", y1);
+    line.setAttribute("x2", x2);
+    line.setAttribute("y2", y2);
+    line.setAttribute("stroke", "#475569"); // slate-600
+    line.setAttribute("stroke-width", "3.5");
+    line.setAttribute("stroke-linecap", "round");
+    svg.appendChild(line);
+  }
+
+  function drawNodes(node, svg) {
+    if (!node) return;
+
+    const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    g.setAttribute("class", "transition-all duration-300");
+
+    // 1. Draw central node circle
+    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    circle.setAttribute("cx", node.x);
+    circle.setAttribute("cy", node.y);
+    circle.setAttribute("r", "22");
+    circle.setAttribute("fill", "#4f46e5"); // indigo-600
+    circle.setAttribute("stroke", "#818cf8"); // indigo-400
+    circle.setAttribute("stroke-width", "2.5");
+    circle.setAttribute("class", "hover:fill-indigo-500 cursor-pointer transition");
+    g.appendChild(circle);
+
+    // 2. Draw node label (Letter)
+    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    text.setAttribute("x", node.x);
+    text.setAttribute("y", node.y + 5);
+    text.setAttribute("text-anchor", "middle");
+    text.setAttribute("fill", "#ffffff");
+    text.setAttribute("class", "font-bold text-sm pointer-events-none");
+    text.textContent = node.value;
+    g.appendChild(text);
+
+    // 3. Draw Add Left Child Button (if empty)
+    if (!node.left) {
+      const addLeftX = node.x - 24;
+      const addLeftY = node.y + 24;
+      createAddButton(g, addLeftX, addLeftY, () => addNode(node.id, 'left'), "L");
+    }
+
+    // 4. Draw Add Right Child Button (if empty)
+    if (!node.right) {
+      const addRightX = node.x + 24;
+      const addRightY = node.y + 24;
+      createAddButton(g, addRightX, addRightY, () => addNode(node.id, 'right'), "R");
+    }
+
+    // 5. Draw Delete Button (not for Root node)
+    if (node.id !== activeTreeRoot.id) {
+      const delX = node.x;
+      const delY = node.y - 28;
+      createDeleteButton(g, delX, delY, () => deleteNode(node.id));
+    }
+
+    svg.appendChild(g);
+
+    // Draw recursive subtrees
+    drawNodes(node.left, svg);
+    drawNodes(node.right, svg);
+  }
+
+  function createAddButton(g, x, y, onClickCallback, sideLabel) {
+    const btnGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    btnGroup.setAttribute("class", "cursor-pointer opacity-75 hover:opacity-100 transition");
+    btnGroup.addEventListener('click', (e) => {
+      e.stopPropagation();
+      onClickCallback();
+    });
+
+    // Outer Circle
+    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    circle.setAttribute("cx", x);
+    circle.setAttribute("cy", y);
+    circle.setAttribute("r", "9.5");
+    circle.setAttribute("fill", "#1e293b"); // slate-800
+    circle.setAttribute("stroke", "#6366f1"); // indigo-500
+    circle.setAttribute("stroke-width", "1.5");
+    btnGroup.appendChild(circle);
+
+    // Plus Text
+    const plus = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    plus.setAttribute("x", x);
+    plus.setAttribute("y", y + 3);
+    plus.setAttribute("text-anchor", "middle");
+    plus.setAttribute("fill", "#818cf8"); // indigo-400
+    plus.setAttribute("class", "text-[9px] font-extrabold");
+    plus.textContent = `+${sideLabel}`;
+    btnGroup.appendChild(plus);
+
+    g.appendChild(btnGroup);
+  }
+
+  function createDeleteButton(g, x, y, onClickCallback) {
+    const btnGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    btnGroup.setAttribute("class", "cursor-pointer opacity-50 hover:opacity-100 transition");
+    btnGroup.addEventListener('click', (e) => {
+      e.stopPropagation();
+      onClickCallback();
+    });
+
+    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    circle.setAttribute("cx", x);
+    circle.setAttribute("cy", y);
+    circle.setAttribute("r", "8");
+    circle.setAttribute("fill", "#7f1d1d"); // red-950
+    circle.setAttribute("stroke", "#ef4444"); // red-500
+    circle.setAttribute("stroke-width", "1");
+    btnGroup.appendChild(circle);
+
+    const xText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    xText.setAttribute("x", x);
+    xText.setAttribute("y", y + 3);
+    xText.setAttribute("text-anchor", "middle");
+    xText.setAttribute("fill", "#fca5a5"); // red-300
+    xText.setAttribute("class", "text-[10px] font-bold");
+    xText.textContent = "×";
+    btnGroup.appendChild(xText);
+
+    g.appendChild(btnGroup);
+  }
+
+  // EVENT ROUTERS (MODE SWITCHING)
+  function switchMode(mode) {
+    currentMode = mode;
+
+    // Reset active button styling
+    const modes = ['materi', 'challenge', 'quiz', 'sandbox'];
+    modes.forEach(m => {
+      const btn = document.getElementById(`btn-${m}`);
+      if (btn) {
+        btn.className = "flex-1 md:flex-none px-3 py-1.5 rounded-lg text-xs md:text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-slate-200";
+      }
+    });
+
+    // Highlight selected button
+    const activeBtn = document.getElementById(`btn-${mode}`);
+    if (activeBtn) {
+      activeBtn.className = "flex-1 md:flex-none px-3 py-1.5 rounded-lg text-xs md:text-sm font-semibold transition-all duration-200 bg-indigo-600 text-white shadow";
+    }
+
+    // Panel layouts toggles
+    const materiPanel = document.getElementById('materi-panel');
+    const leftPanel = document.getElementById('left-panel');
+    const rightPanel = document.getElementById('right-panel');
+
+    if (mode === 'materi') {
+      // Hide standard split panels, show full width materi
+      materiPanel.classList.remove('hidden');
+      leftPanel.classList.add('hidden');
+      rightPanel.classList.add('hidden');
+    } else {
+      // Show standard split panels, hide materi
+      materiPanel.classList.add('hidden');
+      leftPanel.classList.remove('hidden');
+      rightPanel.classList.remove('hidden');
+
+      // Toggle internal left panel contents
+      document.getElementById('panel-challenge').classList.add('hidden');
+      document.getElementById('panel-quiz').classList.add('hidden');
+      document.getElementById('panel-sandbox').classList.add('hidden');
+      document.getElementById(`panel-${mode}`).classList.remove('hidden');
+
+      // Setup mode-specific tree initial state
+      if (mode === 'challenge') {
+        loadChallengeLevel(currentLevel);
+      } else if (mode === 'quiz') {
+        generateQuizTree();
+      } else if (mode === 'sandbox') {
+        initDefaultTree();
+      }
+    }
+  }
+
+  // CHOOSE PRESET FROM MATERI CARD TO SANDBOX
+  function loadSandboxPreset(presetType) {
+    // 1. Switch to sandbox mode first
+    switchMode('sandbox');
+
+    // 2. Clear current tree structure
+    nodeIdCounter = 1;
+    activeTreeRoot = new TreeNode(nodeIdCounter, 'A');
+
+    // 3. Inject preset structures
+    if (presetType === 'full') {
+      addNode(1, 'left');   // B
+      addNode(1, 'right');  // C
+      addNode(3, 'left');   // D
+      addNode(3, 'right');  // E
+      showToast("Preset Dimuat", "Pohon Biner jenis 'Full Tree' (5 node) berhasil dimuat di lab.", "success");
+    } else if (presetType === 'complete') {
+      addNode(1, 'left');   // B
+      addNode(1, 'right');  // C
+      addNode(2, 'left');   // D
+      addNode(2, 'right');  // E
+      addNode(3, 'left');   // F
+      showToast("Preset Dimuat", "Pohon Biner jenis 'Complete Tree' (6 node, rata kiri) berhasil dimuat.", "success");
+    } else if (presetType === 'perfect') {
+      addNode(1, 'left');   // B
+      addNode(1, 'right');  // C
+      addNode(2, 'left');   // D
+      addNode(2, 'right');  // E
+      addNode(3, 'left');   // F
+      addNode(3, 'right');  // G
+      showToast("Preset Dimuat", "Pohon Biner jenis 'Perfect Tree' (Tinggi 3, 7 node penuh) berhasil dimuat.", "success");
+    } else if (presetType === 'balanced') {
+      addNode(1, 'left');   // B
+      addNode(1, 'right');  // C
+      addNode(2, 'left');   // D
+      showToast("Preset Dimuat", "Pohon Biner jenis 'Balanced Tree' (Selisih tinggi kiri-kanan &le; 1) berhasil dimuat.", "success");
+    } else if (presetType === 'degenerate') {
+      addNode(1, 'left');   // B
+      addNode(2, 'left');   // C
+      addNode(3, 'left');   // D
+      showToast("Preset Dimuat", "Pohon Biner jenis 'Degenerate Tree' (Linear seperti Linked List) berhasil dimuat.", "success");
+    }
+
+    renderTree();
+    updateSandboxAnalysis();
+  }
+
+  // CHALLENGE MODE CONTROLLER
+  function loadChallengeLevel(index) {
+    currentLevel = index;
+    const data = challenges[index];
+
+    document.getElementById('challenge-score').textContent = `Tingkat ${index + 1}/${challenges.length}`;
+    document.getElementById('challenge-title').textContent = data.title;
+    document.getElementById('challenge-desc').innerHTML = data.desc;
+
+    // Start with fresh default tree
+    initDefaultTree();
+  }
+
+  function checkChallengeAnswer() {
+    const data = challenges[currentLevel];
+    const size = countNodes(activeTreeRoot);
+    const height = getHeight(activeTreeRoot);
+
+    const isCorrect = data.validate(activeTreeRoot, size, height);
+
+    if (isCorrect) {
+      showToast("Jawaban Benar!", data.successMsg, "success");
+
+      // Move to next level if available
+      if (currentLevel < challenges.length - 1) {
+        setTimeout(() => {
+          loadChallengeLevel(currentLevel + 1);
+        }, 3500);
+      } else {
+        setTimeout(() => {
+          showToast("🎉 Champion!", "Anda telah menyelesaikan seluruh modul petualangan Binary Tree!", "success");
+        }, 3500);
+      }
+    } else {
+      // Formulate detailed error feedback
+      let feedback = "Kriteria belum terpenuhi. Periksa kembali struktur pohon Anda.";
+      if (currentLevel === 0 && size !== 5) {
+        feedback = `Jumlah node Anda saat ini adalah ${size}, tetapi tantangan meminta tepat 5 node.`;
+      } else if (currentLevel === 0 && !checkFull(activeTreeRoot)) {
+        feedback = `Pohon Anda bukan Full Tree. Ada node yang hanya memiliki 1 cabang anak.`;
+      } else if (currentLevel === 1 && size !== 6) {
+        feedback = `Jumlah node saat ini ${size}, diminta tepat 6 node.`;
+      } else if (currentLevel === 1 && !checkComplete(activeTreeRoot)) {
+        feedback = `Bukan Complete Tree. Pastikan tidak ada celah kosong pada level terbawah dari kiri ke kanan.`;
+      } else if (currentLevel === 2 && height !== 3) {
+        feedback = `Tinggi pohon Anda saat ini adalah ${height}, diminta tepat tinggi 3.`;
+      } else if (currentLevel === 2 && !checkPerfect(activeTreeRoot)) {
+        feedback = `Bukan Perfect Tree. Pastikan semua daun sejajar penuh dan rata.`;
+      }
+
+      showToast("Struktur Salah", feedback, "error");
+    }
+  }
+
+  // QUIZ MODE GENERATOR & CONTROLLER
+  let quizAnswers = {}; // stores answers for current quiz question
+
+  function generateQuizTree() {
+    // Generate a random-like tree with diverse properties
+    initDefaultTree();
+
+    const randomType = Math.floor(Math.random() * 5); // 0 to 4
+
+    if (randomType === 0) {
+      // Generate a Perfect Tree of Height 3 (7 nodes)
+      addNode(1, 'left');  // Node B (id: 2)
+      addNode(1, 'right'); // Node C (id: 3)
+      addNode(2, 'left');  // Node D (id: 4)
+      addNode(2, 'right'); // Node E (id: 5)
+      addNode(3, 'left');  // Node F (id: 6)
+      addNode(3, 'right'); // Node G (id: 7)
+    } else if (randomType === 1) {
+      // Generate a Complete Tree but NOT Full, NOT Perfect (5 nodes, size 5)
+      addNode(1, 'left');  // B (2)
+      addNode(1, 'right'); // C (3)
+      addNode(2, 'left');  // D (4)
+      addNode(2, 'right'); // E (5)
+    } else if (randomType === 2) {
+      // Generate a Full Tree but NOT Complete, NOT Perfect (5 nodes)
+      addNode(1, 'left');  // B (2)
+      addNode(1, 'right'); // C (3)
+      addNode(3, 'left');  // D (4)
+      addNode(3, 'right'); // E (5)
+    } else if (randomType === 3) {
+      // Degenerate Tree (3 nodes)
+      addNode(1, 'left');
+      addNode(2, 'left');
+    } else {
+      // Just an unbalanced, non-full tree (4 nodes)
+      addNode(1, 'left');
+      addNode(1, 'right');
+      addNode(2, 'right');
+    }
+
+    renderTree();
+
+    // Calculate correct categories for the generated tree
+    quizAnswers = {
+      full: checkFull(activeTreeRoot),
+      complete: checkComplete(activeTreeRoot),
+      perfect: checkPerfect(activeTreeRoot),
+      balanced: checkBalanced(activeTreeRoot)
+    };
+
+    // Reset checkboxes
+    document.getElementById('quiz-opt-full').checked = false;
+    document.getElementById('quiz-opt-complete').checked = false;
+    document.getElementById('quiz-opt-perfect').checked = false;
+    document.getElementById('quiz-opt-balanced').checked = false;
+  }
+
+  function checkQuizAnswer() {
+    const userFull = document.getElementById('quiz-opt-full').checked;
+    const userComplete = document.getElementById('quiz-opt-complete').checked;
+    const userPerfect = document.getElementById('quiz-opt-perfect').checked;
+    const userBalanced = document.getElementById('quiz-opt-balanced').checked;
+
+    const isCorrect = (userFull === quizAnswers.full) &&
+            (userComplete === quizAnswers.complete) &&
+            (userPerfect === quizAnswers.perfect) &&
+            (userBalanced === quizAnswers.balanced);
+
+    quizAttempts++;
+    if (isCorrect) {
+      quizScore++;
+      showToast("Analisis Sempurna!", "Anda berhasil mendeteksi semua properti pohon biner ini dengan tepat!", "success");
+
+      // Load a new question shortly
+      setTimeout(() => {
+        generateQuizTree();
+      }, 2500);
+    } else {
+      // Formulate friendly correction explanation
+      let corrections = [];
+      if (userFull !== quizAnswers.full) corrections.push(`Pohon ini ${quizAnswers.full ? 'merupakan' : 'bukan'} Full Tree`);
+      if (userComplete !== quizAnswers.complete) corrections.push(`Pohon ini ${quizAnswers.complete ? 'merupakan' : 'bukan'} Complete Tree`);
+      if (userPerfect !== quizAnswers.perfect) corrections.push(`Pohon ini ${quizAnswers.perfect ? 'merupakan' : 'bukan'} Perfect Tree`);
+      if (userBalanced !== quizAnswers.balanced) corrections.push(`Pohon ini ${quizAnswers.balanced ? 'merupakan' : 'bukan'} Balanced Tree`);
+
+      showToast(
+              "Kurang Tepat",
+              `Koreksi: <ul class="list-disc pl-4 mt-1"><li>${corrections.join('</li><li>')}</li></ul>`,
+              "error"
+      );
+    }
+
+    document.getElementById('quiz-score').textContent = `Skor: ${quizScore}/${quizAttempts}`;
+  }
+
+  // SANDBOX REAL-TIME ANALYSIS UPDATE
+  function updateSandboxAnalysis() {
+    if (currentMode !== 'sandbox') return;
+
+    const size = countNodes(activeTreeRoot);
+    const height = getHeight(activeTreeRoot);
+
+    document.getElementById('stat-height').textContent = height;
+    document.getElementById('stat-nodes').textContent = size;
+
+    if (size === 0) return;
+
+    // Run calculations
+    updatePropertyBadge('status-full', checkFull(activeTreeRoot));
+    updatePropertyBadge('status-complete', checkComplete(activeTreeRoot));
+    updatePropertyBadge('status-perfect', checkPerfect(activeTreeRoot));
+    updatePropertyBadge('status-balanced', checkBalanced(activeTreeRoot));
+  }
+
+  function updatePropertyBadge(elementId, isTrue) {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+    const span = element.querySelector('span');
+
+    if (isTrue) {
+      element.className = "p-2.5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 text-center text-emerald-400 transition-all duration-300 shadow-md shadow-emerald-500/5";
+      span.textContent = "Ya ✓";
+    } else {
+      element.className = "p-2.5 rounded-xl border border-red-500/20 bg-red-500/5 text-center text-red-400/80 transition-all duration-300";
+      span.textContent = "Tidak ✗";
+    }
+  }
+
+  // GLOBAL TOAST NOTIFICATION UTILITY
+  function showToast(title, message, type = 'info') {
+    const toast = document.getElementById('feedback-toast');
+    const iconBox = document.getElementById('toast-icon-box');
+    const titleEl = document.getElementById('toast-title');
+    const msgEl = document.getElementById('toast-message');
+
+    toast.classList.remove('hidden', 'bg-emerald-950/90', 'border-emerald-500/40', 'text-emerald-300', 'bg-red-950/90', 'border-red-500/40', 'text-red-300', 'bg-slate-800', 'border-slate-700', 'text-slate-200');
+
+    if (type === 'success') {
+      toast.classList.add('bg-emerald-950/90', 'border-emerald-500/40', 'text-emerald-300');
+      titleEl.className = "font-bold text-sm text-emerald-100";
+      iconBox.className = "p-1.5 rounded-lg text-emerald-400 bg-emerald-500/20";
+      iconBox.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>`;
+    } else if (type === 'error') {
+      toast.classList.add('bg-red-950/90', 'border-red-500/40', 'text-red-300');
+      titleEl.className = "font-bold text-sm text-red-100";
+      iconBox.className = "p-1.5 rounded-lg text-red-400 bg-red-500/20";
+      iconBox.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>`;
+    } else {
+      toast.classList.add('bg-slate-800', 'border-slate-700', 'text-slate-200');
+      titleEl.className = "font-bold text-sm text-slate-100";
+      iconBox.className = "p-1.5 rounded-lg text-indigo-400 bg-indigo-500/20";
+      iconBox.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /></svg>`;
+    }
+
+    titleEl.textContent = title;
+    msgEl.innerHTML = message;
+    toast.classList.remove('hidden');
+
+    // Automatically hide after 4.5 seconds
+    clearTimeout(window.toastTimeout);
+    window.toastTimeout = setTimeout(() => {
+      toast.classList.add('hidden');
+    }, 4500);
+  }
+
+  // Initialize App on DOM Ready
+  window.onload = function() {
+    initDefaultTree();
+    switchMode('materi'); // Start with Materi page to let user read first!
+
+    // Adjust SVG box sizing on dynamic window resize
+    window.addEventListener('resize', () => {
+      renderTree();
+    });
+  };
+</script>
+</body>
+</html>
